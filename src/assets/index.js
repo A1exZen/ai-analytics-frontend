@@ -1,9 +1,6 @@
-import linkIcon from './link.svg'
-import loader from './loader.svg'
-import copy from './copy.svg'
-import logo from './logo.svg'
-import tick from './tick.svg'
-import iconLogo from './iconLogo.svg'
-export {
-	loader,
-}
+
+import loader from "./loader.svg";
+import logo from "./logo.svg";
+import uploadImg from "./upload.svg";
+import macPreview from "./mac_preview.png";
+export { loader, uploadImg, macPreview, logo };

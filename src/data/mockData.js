@@ -1,206 +1,79 @@
-export const metricsData = [
-	{
-		id: "1",
-		title: "Кол-во посещений",
-		value: "23,351",
-		change: 1137,
-		isPositive: false
-	},
-	{
-		id: "2",
-		title: "Среднее время сессии",
-		value: "92.19",
-		unit: "min",
-		change: 0.15,
-		isPositive: true
-	},
-	{
-		id: "3",
-		title: "Показатель отказов",
-		value: "45.67%",
-		change: 0.5,
-		isPositive: false
-	},
-	{
-		id: "4",
-		title: "Кол-во просмотров страниц",
-		value: "536,12",
-		change: 1137,
-		isPositive: true
-	},
-];
-function generateRandomChartData(period) {
-	const data = [];
-	let startDate = new Date();
-
-	for (let i = 0; i < 30; i++) {
-		// Форматируем дату в формате ДД.ММ
-		const day = String(startDate.getDate()).padStart(2, '0'); // Получаем день и добавляем ведущий ноль
-		const month = String(startDate.getMonth() + 1).padStart(2, '0'); // Получаем месяц и добавляем ведущий ноль
-		const formattedDate = `${day}.${month}`; // Форматируем дату в нужном виде
-
-		data.push({
-			date: formattedDate,
-			value: Math.floor(Math.random() * 100) + 1
-		});
-
-		startDate.setDate(startDate.getDate() - 1); // Уменьшаем дату на 1 день
+{
+	"pageSpeed": {
+	"performance": 95,
+		"metrics": {
+		"serverResponseTime": "Root document took 80 ms",
+			"totalByteWeight": "Total size was 731 KiB",
+			"speedIndex": "0.8 s",
+			"firstContentfulPaint": "0.6 s",
+			"largestContentfulPaint": "0.9 s",
+			"totalBlockingTime": "170 ms",
+			"interactive": "1.7 s",
+			"firstMeaningfulPaint": "N/A",
+			"cumulativeLayoutShift": "0",
+			"usesOptimizedImages": "Yes",
+			"networkRTT": "0 ms"
 	}
-	return data;
-}
-
-// Генерация случайных данных для тепловой карты
-function generateRandomHeatmapData() {
-	return {
-		"Home": Math.floor(Math.random() * 100),
-		"Product": Math.floor(Math.random() * 100),
-		"Checkout": Math.floor(Math.random() * 100),
-		"About": Math.floor(Math.random() * 100),
-		"Contact": Math.floor(Math.random() * 100)
-	};
-}
-// Генерация случайных данных для поведения пользователей
-function generateRandomBehaviorData() {
-	const stages = ["Landing Page", "Product Page", "Cart", "Checkout"];
-	const data = [];
-	stages.forEach((stage, index) => {
-		data.push({
-			stage: stage,
-			users: Math.floor(Math.random() * 1000) + 1
-		});
-	});
-	return data;
-}
-
-function generateRandomMapData(countries) {
-	return countries.map(country => ({
-		...country,
-		visits: Math.floor(Math.random() * 10000) + 1000
-	}));
-}
-
-// Моковые данные для аналитики сайта
-export const mockData = {
-	// Основные метрики
-	traffic: {
-		value: 52345, // Общее количество посещений
-		growth: 12, // Прирост по сравнению с прошлым месяцем
-		chart: generateRandomChartData('week') // График за неделю
+},
+	"openAIAnalysis": {
+	"url": "https://goolge.com",
+		"purpose": "Search engine providing web search services and information.",
+		"mobile_optimization": {
+		"status": "Optimized",
+			"features": "Responsive design, fast loading, and user-friendly interface."
 	},
-	bounceRate: {
-		value: 45.3, // Показатель отказов (%)
-		growth: -5, // Прирост (или снижение) по сравнению с прошлым месяцем
-		chart: generateRandomChartData('month') // График за месяц
+	"average_loading_speed": {
+		"estimated_speed": "150",
+			"notes": "Fast loading speed due to optimized content and infrastructure."
 	},
-	timeOnSite: {
-		value: 3.2, // Среднее время на сайте (в минутах)
-		growth: 10, // Прирост по сравнению с прошлым месяцем
-		chart: generateRandomChartData('year') // График за год
+	"ssl_certificate": {
+		"status": "Valid",
+			"security_measures": "Uses HTTPS protocol to secure user data."
 	},
-	conversions: {
-		value: 1234, // Конверсии (регистрации, покупки)
-		growth: 8, // Прирост по сравнению с прошлым месяцем
-		chart: generateRandomChartData('week') // График по типам конверсий
+	"seo_score": {
+		"keywords": "Optimized for multiple keywords related to search queries.",
+			"meta_tags": "Well-structured meta tags present.",
+			"description": "Clear and concise meta description."
 	},
-	trafficSources: {
-		organic: 60, // Процент органического трафика
-		direct: 20, // Процент прямого трафика
-		referral: 10, // Процент реферального трафика
-		social: 10, // Процент трафика с соцсетей
-		chart: generateRandomChartData('month') // График источников трафика (Pie Chart)
+	"links": {
+		"internal_links": "50",
+			"external_links": "200"
 	},
-	pagesPerSession: {
-		value: 5.6, // Страниц на сессию
-		growth: 4, // Прирост по сравнению с прошлым месяцем
-		chart: generateRandomChartData('month') // График
+	"accessibility_evaluation": {
+		"alt_tags": "All images have descriptive alt tags.",
+			"aria_labels": "ARIA labels are implemented for better navigation."
 	},
-	pageSpeed: {
-		value: 2.1, // Скорость загрузки (в секундах)
-		chart: generateRandomChartData('week') // График скорости загрузки
+	"estimated_bounce_rate": {
+		"rate": "20%",
+			"reason": "Low bounce rate due to high user engagement."
 	},
-
-	// Дополнительные метрики
-	uniqueVisitors: {
-		value: 30234, // Уникальные посетители
-		growth: 15, // Прирост по сравнению с прошлым месяцем
-		chart: generateRandomChartData('month') // График за месяц
+	"traffic_estimation": {
+		"social": "5%",
+			"referral": "10%",
+			"organic": "85%"
 	},
-	seoRanking: {
-		value: 18, // Позиции в поисковой выдаче
-		growth: 2, // Прирост позиций
-		chart: generateRandomChartData('month') // График позиций (Line Chart)
+	"performance_scores": {
+		"mobile": "95",
+			"desktop": "98"
 	},
-	userEngagement: {
-		value: 0.75, // Средний уровень вовлеченности (например, клик / просмотр)
-		growth: 5, // Прирост по сравнению с прошлым месяцем
-		chart: generateRandomChartData('month') // График вовлеченности
+	"quality_of_content": "High quality, unique, and relevant content tailored to user search intent.",
+		"domain_authority": "99",
+		"user_engagement_metrics": {
+		"average_time_on_site": "5 minutes",
+			"page_views_per_session": "7"
 	},
-	subscribers: {
-		value: 1234, // Количество подписчиков
-		growth: 8, // Прирост по сравнению с прошлым месяцем
-		chart: generateRandomChartData('week') // График подписок
+	"backlinks": {
+		"quantity": "5000",
+			"quality": "High authority sites linking back."
 	},
-	errorRate: {
-		value: 1.2, // Количество ошибок (например, 404 или 500)
-		chart: generateRandomChartData('month') // График ошибок
-	},
-
-	// Премиум метрики
-	heatmap: {
-		chart: generateRandomHeatmapData() // Тепловая карта
-	},
-	pageSpeedByPage: {
-		data: [
-			{ page: 'Home', speed: 2.3 },
-			{ page: 'Product', speed: 1.9 },
-			{ page: 'Checkout', speed: 3.5 }
-		], // Время загрузки каждой страницы
-		chart: generateRandomChartData('year') // График по страницам
-	},
-	audienceSegmentation: {
-		male: 60, // Процент мужчин
-		female: 40, // Процент женщин
-		chart: generateRandomChartData('month') // Сегментация аудитории
-	},
-	userBehavior: {
-		chart: generateRandomBehaviorData() // Потведение пользоваелей (Flow Chart)
-	},
-	competitorSeoRanking: {
-		competitors: [
-			{ name: 'Competitor A', rank: 15 },
-			{ name: 'Competitor B', rank: 20 },
-			{ name: 'Competitor C', rank: 12 }
-		], // Позиции конкурентов
-		chart: generateRandomChartData('month') // График конкурентов
-	},
-	mobileUserBehavior: {
-		mobile: 70, // Процент мобильных пользователей
-		desktop: 30, // Процент десктопных пользователей
-		// chart: generateRandomChartData('month') // Мобильное поведение
-	},
-	visitMap: {
-		countries: [
-			{ name: "United States", visits: 14523, lat: 37.0902, lon: -95.7129 },  // Пример для США
-			{ name: "Germany", visits: 9321, lat: 51.1657, lon: 10.4515 },  // Германия
-			{ name: "India", visits: 8531, lat: 20.5937, lon: 78.9629 },  // Индия
-			{ name: "Brazil", visits: 7210, lat: -14.2350, lon: -51.9253 },  // Бразилия
-			{ name: "United Kingdom", visits: 5420, lat: 51.5074, lon: -0.1278 },  // Великобритания
-			{ name: "Australia", visits: 4621, lat: -25.2744, lon: 133.7751 },  // Австралия
-		],
-		chart: generateRandomMapData([
-			{ name: "United States", visits: 14523, lat: 37.0902, lon: -95.7129 },
-			{ name: "Germany", visits: 9321, lat: 51.1657, lon: 10.4515 },
-			{ name: "India", visits: 8531, lat: 20.5937, lon: 78.9629 },
-			{ name: "Brazil", visits: 7210, lat: -14.2350, lon: -51.9253 },
-			{ name: "United Kingdom", visits: 5420, lat: 51.5074, lon: -0.1278 },
-			{ name: "Australia", visits: 4621, lat: -25.2744, lon: 133.7751 },
-		]) // Используем функцию с передачей данных
+	"content_freshness": "Content is regularly updated to reflect current trends and information.",
+		"security_vulnerabilities": "No known vulnerabilities such as XSS or CSRF.",
+		"recommendations": {
+		"performance_improvement": "Optimize images further to improve load times.",
+			"seo_improvement": "Increase keyword diversity and update meta descriptions regularly.",
+			"accessibility_improvement": "Add more ARIA roles to enhance navigation for screen readers.",
+			"security_improvement": "Regularly update security measures and conduct vulnerability assessments.",
+			"content_quality_improvement": "Continue to produce high-quality content that addresses user queries."
 	}
-};
-
-// Генерация случайных данных для графиков (для моков)
-
-
-// Пример доступа к данным:
-// console.log(mockData.traffic.value);  // Количество трафика
-// console.log(mockData.traffic.chart);  // График трафика за неделю
+}
+}

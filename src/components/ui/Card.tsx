@@ -4,10 +4,11 @@ import {MdLock} from "react-icons/md";
 
 interface CardProps {
 	title: string;
-	value: number;
-	change: number;
-	isPositive: boolean;
+	value?: number | string;
+	change?: number;
+	isPositive?: boolean;
 	isLocked: boolean;
+	customValue?: React.ReactNode;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -15,11 +16,12 @@ export const Card: React.FC<CardProps> = ({
 	                                          value,
 	                                          change,
 	                                          isPositive,
-	                                          isLocked
+	                                          isLocked,
+	                                          customValue
                                           }) => {
 	return (
 		<motion.div
-			className={`relative bg-white p-4 rounded-xl shadow-md flex flex-col justify-between gap-5 ${
+			className={`relative bg-white dark:bg-darkGray p-4 rounded-xl shadow-md flex flex-col justify-between gap-3 ${
 				isLocked ? "blur-[2px] opacity-50 cursor-not-allowed" : ""
 			}`}
 			whileHover={!isLocked ? {scale: 1.05} : {}}
@@ -31,17 +33,20 @@ export const Card: React.FC<CardProps> = ({
 				</div>
 			)}
 			<h2
-				className={`font-medium ${isLocked ? "text-gray-400" : "text-gray-600"}`}>{title}</h2>
+				className={`font-medium ${isLocked ? "text-gray-400" : "text-gray-600 dark:text-gray-200"}`}>{title}</h2>
 			<div className="flex items-center gap-3">
-				<p
-					className={`text-3xl font-bold ${isLocked ? "text-gray-400" : ""}`}>{value.toLocaleString()}</p>
-				<p
-					className={`text-sm rounded-md px-2 ${
-						isLocked ? "text-gray-400 bg-gray-200" : isPositive ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100"
-					}`}
-				>
-					{isPositive ? "↑" : "↓"} {change.toLocaleString()}
-				</p>
+				{value && <p
+					className={`text-3xl font-bold text-gray-700 ${isLocked ? "text-gray-400" : ""}`}>{value.toLocaleString()}</p>}
+				{customValue && <div className="text-sm">{customValue}</div>}
+				{change && (
+					<p
+						className={`text-sm rounded-md px-2 ${
+							isLocked ? "text-gray-500 bg-gray-200" : isPositive ? "text-green-700 bg-green-100" : "text-red-700 bg-red-100"
+						}`}
+					>
+						{isPositive ? "↑" : "↓"} {change.toLocaleString()}
+					</p>
+				)}
 			</div>
 		</motion.div>
 	);
