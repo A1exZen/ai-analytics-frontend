@@ -16,11 +16,11 @@ export const AccordionCard = ({title, text, important}) => {
 	return (
 		<>
 			<Accordion open={open === 1}
-			           className="mb-2 rounded-lg border border-blue-gray-100 px-4">
+			           className="mb-2 rounded-lg border border-gray-100 dark:border-gray-600 px-4">
 				<AccordionHeader
 					onClick={() => handleOpen(1)}
 					className={`border-b-0 transition-colors ${
-						open === 1 ? "text-blue-500 hover:!text-blue-700" : ""
+						open === 1 ? "text-blue-500 hover:text-blue-700!" : ""
 					}`}
 				>
 					<div className='w-full flex justify-between items-center'>

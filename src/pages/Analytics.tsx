@@ -1,23 +1,15 @@
 import React, {SetStateAction, useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {motion} from "framer-motion";
-import GaugeChart from 'react-gauge-chart';
 import {Data, PageSpeed, OpenAIAnalysis} from "../types/types.ts";
-import {
-	Popover,
-	PopoverHandler,
-	PopoverContent,
-} from "@material-tailwind/react";
 
 import {
-	VictoryPie,
 	VictoryBar,
 	VictoryChart,
 	VictoryAxis,
 	VictoryTooltip,
-	VictoryLine,
 	VictoryTheme,
-	VictoryLegend, VictoryVoronoiContainer,
+	VictoryLegend,
 } from "victory";
 
 import {IoAnalytics} from "react-icons/io5";
@@ -30,10 +22,9 @@ import PerformanceGauges
 	from "../components/ui/analytics/PerformanceGauges.tsx";
 import {BiSolidLike} from "react-icons/bi";
 import TrafficType from "../components/ui/analytics/TrafficType.tsx";
+import {SEO} from "@/components/ui/analytics/SEO.tsx";
+import TrafficMap from "@/components/ui/analytics/TrafficMap.tsx";
 
-const COLORS = ["#0088FE", "#00C49F", "#ff8528", '#8b5eda', '#da5e73'];
-// const BAR_COLORS = ["#5B8FF9", "#FF6B6B"];
-// const LOADING_COLORS = ["#8884d8", "#82ca9d", "#FFBB28", "#FF8042"];
 function removeProtocol(url: string): string {
 	return url.replace(/^(https?:\/\/)?(www\.)?/, '');
 }
@@ -91,7 +82,7 @@ const Analytics: React.FC = () => {
 
 		return (
 			<motion.main
-				className='w-full h-full bg-slate-100 dark:bg-backgroundDark mt-[74px] py-10 px-5 dark:text-white'
+				className='w-full h-full bg-background mt-[74px] py-10 px-5 dark:text-white'
 				initial={{opacity: 0}}
 				animate={{opacity: 1}}
 				transition={{duration: 0.5}}
@@ -104,13 +95,13 @@ const Analytics: React.FC = () => {
 				>
 					{/*-------------------------1 Line Card-------------------------*/}
 					<motion.div
-						className='relative flex justify-between flex-wrap items-center bg-white dark:bg-darkGray p-5 rounded-xl shadow-md md:pt-5 pt-8'
+						className='relative flex justify-between flex-wrap items-center bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md md:pt-5 pt-8'
 						initial={{scale: 0.95, opacity: 0}}
 						animate={{scale: 1, opacity: 1}}
 						transition={{duration: 0.4}}
 					>
 						<div
-							className='absolute flex gap-1 top-0 left-1/2 z-10 transform -translate-x-1/2 -translate-y-1/2 bg-gray-200 p-1 rounded-2xl border-4 border-white dark:bg-gray-600 dark:border-mainGray'>
+							className='absolute flex gap-1 top-0 left-1/2 z-10 transform -translate-x-1/2 -translate-y-1/2 bg-gray-200 p-1 rounded-2xl border-4 border-white dark:bg-gray-600 dark:border-gray-800'>
 							<div
 								className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:scale-105 duration-200 ${
 									activeTab === "1" ? "bg-white dark:bg-gray-500" : ""
@@ -217,25 +208,24 @@ const Analytics: React.FC = () => {
 								/>
 								<Card
 									title='Среднее время на сайте'
-									value={openAIAnalysis.user_engagement_metrics.average_time_on_site}
+									value={`${openAIAnalysis.user_engagement_metrics.average_time_on_site} s`}
 									isLocked={false}
 								/>
-								<Popover>
-									<PopoverHandler>
-										<Card
-											title='Статус SSL сертификата'
-											customValue={
-												<>
+
+								<Card
+									title='Статус SSL сертификата'
+									tooltip={openAIAnalysis.ssl_certificate.security_measures}
+									customValue={
+										<>
 										<span
-											className={`text-3xl font-bold`}>{openAIAnalysis.ssl_certificate.status}</span>
-												</>
-											}
-											isLocked={false}
-										/>
-									</PopoverHandler>
-								</Popover>
+											className={`text-xl font-bold`}>{openAIAnalysis.ssl_certificate.status}</span>
+										</>
+									}
+									isLocked={false}
+								/>
 								<Card
 									title='Средняя скорость загрузки страницы'
+									tooltip={openAIAnalysis.average_loading_speed.notes}
 									customValue={
 										<>
 										<span
@@ -254,7 +244,7 @@ const Analytics: React.FC = () => {
 							>
 								<TrafficType trafficData={trafficData} deviceData={deviceData}/>
 								<div
-									className='bg-white dark:bg-darkGray p-4 rounded-xl shadow-md flex flex-col'>
+									className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col'>
 									<div className='flex justify-center items-center'>
 										<h2 className='font-medium text-gray-600 dark:text-gray-200'>
 											Показатель Отказов
@@ -269,6 +259,7 @@ const Analytics: React.FC = () => {
 											<VictoryLegend
 												x={40} y={-20}
 												orientation="horizontal"
+												style={{labels: {fill: "var(--foreground)"},}}
 												gutter={15}
 												data={dataPageSpeed.slice(0, Math.ceil(dataPageSpeed.length / 2)).map((d) => ({
 													name: d.x,
@@ -278,6 +269,7 @@ const Analytics: React.FC = () => {
 											<VictoryLegend
 												x={100} y={350}
 												orientation="horizontal"
+												style={{labels: {fill: "var(--foreground)"},}}
 												gutter={15}
 												data={dataPageSpeed.slice(Math.ceil(dataPageSpeed.length / 2)).map((d) => ({
 													name: d.x,
@@ -307,62 +299,14 @@ const Analytics: React.FC = () => {
 								animate={{opacity: 1}}
 								transition={{duration: 0.5, delay: 0.4}}
 							>
+								<SEO openAIAnalysis={openAIAnalysis}/>
 								<div
-									className='bg-white p-4 rounded-xl shadow-md flex flex-col'>
+									className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col justify-between'>
 									<div className='flex justify-between items-center'>
-										<h2 className='font-medium text-gray-600'>
-											SEO
-										</h2>
-									</div>
-									<div
-										className='grid grid-cols-2 sm:grid-cols-3 gap-3 text-gray-400 h-full'>
-										<Card
-											title='Вовлеченность пользователей'
-											value=''
-											isLocked={false}
-										/>
-										<Card
-											title='Авторитет домена'
-											value={openAIAnalysis.domain_authority}
-											isLocked={false}
-										/>
-										<Card
-											title='Обратные ссылки'
-											value={openAIAnalysis.backlinks.quantity}
-											isLocked={false}
-										/>
-										<div className='col-span-3'>
-											<Card
-												title='Уязвимости безопасности'
-												customValue={
-													<div className='flex justify-between w-full'>
-														<div
-															className='text-blue-600 font-bold mr-2'>XSS: <span
-															className={`text-gray-400 font-medium`}>{openAIAnalysis.security_vulnerabilities.XSS}</span>
-														</div>
-														<div
-															className='text-blue-600 font-bold mr-2'>CSRF: <span
-															className={`text-gray-400 font-medium`}>{openAIAnalysis.security_vulnerabilities.CSRF}</span>
-														</div>
-													</div>
-												}
-												isLocked={false}
-											/>
-										</div>
-									</div>
-								</div>
-								<div
-									className='bg-white p-4 rounded-xl shadow-md flex flex-col justify-between'>
-									<div className='flex justify-between items-center'>
-										<h2 className='font-medium text-gray-600'>
+										<h2 className='font-medium text-gray-600 dark:text-gray-200 mb-3'>
 											Прочие данные
 										</h2>
-										<select
-											className='border border-gray-300 text-gray-600 text-sm rounded-lg py-2 px-1'>
-											<option selected>All</option>
-											<option value=''>Option 1</option>
-											<option value=''>Option 2</option>
-										</select>
+
 									</div>
 									<div
 										className='grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-400'>
@@ -370,21 +314,25 @@ const Analytics: React.FC = () => {
 											title='Страниц за сессию'
 											value={openAIAnalysis.user_engagement_metrics.page_views_per_session}
 											isLocked={false}
+											className='border border-border'
 										/>
 										<Card
 											title='Авторитет домена'
-											value={openAIAnalysis.domain_authority}
+											customValue={
+												<>
+										<span
+											className={`text-3xl font-bold ${Number(openAIAnalysis.domain_authority) > 70 ? 'text-green-600' : 'text-red-600'} `}>{openAIAnalysis.domain_authority}</span>
+												</>
+											}
 											isLocked={false}
+											className='border border-border'
 										/>
 										<div className='col-span-2'>
 											<Card
+												tooltip={openAIAnalysis.mobile_optimization.score.toLocaleString()}
 												title='Оптимизация для мобильных устройств'
-												customValue={
-													<>
-										<span
-											className={`text-3xl font-bold ${openAIAnalysis.mobile_optimization.status === 'Оптимизировано' ? 'text-green-600' : 'text-red-600'} `}>{openAIAnalysis.mobile_optimization.status}</span>
-													</>
-												}
+												className='border border-border'
+												customValue={<div className='text-2xl text-gray-800 dark:text-gray-400 font-semibold'>{openAIAnalysis.mobile_optimization.status}</div>}
 												isLocked={false}
 											/>
 										</div>
@@ -399,9 +347,9 @@ const Analytics: React.FC = () => {
 								transition={{duration: 0.5, delay: 0.4}}
 							>
 								<div
-									className='bg-white p-4 rounded-xl shadow-md flex flex-col justify-between'>
-									<div className='flex justify-between items-center'>
-										<h2 className='font-medium text-gray-600'>
+									className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col justify-between'>
+									<div className='flex justify-between items-center mb-2'>
+										<h2 className='font-medium text-gray-600 dark:text-gray-200'>
 											Бизнес
 										</h2>
 									</div>
@@ -409,6 +357,7 @@ const Analytics: React.FC = () => {
 										className='grid grid-cols-2 sm:grid-cols-3 gap-3 text-gray-400'>
 										<Card
 											title="Конкуренты"
+											className="border border-border"
 											isLocked={false}
 											customValue={
 												<div className="flex flex-wrap gap-2">
@@ -425,11 +374,13 @@ const Analytics: React.FC = () => {
 										/>
 										<Card
 											title='Доля рынка'
+											className="border border-border"
 											isPositive={openAIAnalysis.market_share > 50}
-											value={openAIAnalysis.market_share}
+											value={`${openAIAnalysis.market_share} %`}
 											isLocked={false}
 										/>
 										<Card
+											className="border border-border"
 											title='Упоминания в соц. сетях'
 											value={`~ ${openAIAnalysis.social_mentions}`}
 											isLocked={false}
@@ -437,36 +388,48 @@ const Analytics: React.FC = () => {
 									</div>
 								</div>
 							</motion.div>
+							<motion.div
+								className='grid grid-cols-1 gap-4'
+								initial={{opacity: 0}}
+								animate={{opacity: 1}}
+								transition={{duration: 0.5, delay: 0.4}}
+							>
+								<div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
+									<h2 className="font-medium text-gray-600 dark:text-gray-200 mb-3">
+										География трафика
+									</h2>
+									<TrafficMap trafficGeography={openAIAnalysis.traffic_geography} />
+								</div>
+							</motion.div>
 							{/*-----------------------------------------*/}
 							<motion.div
 								initial={{opacity: 0}}
 								animate={{opacity: 1}}
 								transition={{duration: 0.5, delay: 0.4}}
-								className='bg-white p-4 rounded-xl shadow-md flex flex-col justify-between'>
-								<div className='flex justify-between items-center'>
-									<h2 className='font-medium text-gray-600'>
+								className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col justify-between'>
+								<div className='flex justify-between items-center mb-2'>
+									<h2 className='font-medium text-gray-600 dark:text-gray-200'>
 										Рекомендации
 									</h2>
 								</div>
 								<div
 									className='flex flex-col items-center justify-center text-gray-400 mt-2 gap-2'>
 									{Object.entries(openAIAnalysis.recommendations).map(([key, value]) => (
-										<motion.div
+										<div
 											key={key}
-											className={`bg-white px-7 py-3 rounded-xl flex justify-between items-center gap-5 w-full border-b border-gray-300`}
-											whileHover={{backgroundColor: "rgb(234,234,234)"}}
+											className={`transition-all ease-in-out hover:bg-gray-100 dark:hover:bg-gray-700  bg-white dark:bg-gray-600 px-7 py-3 rounded-xl flex justify-between items-center gap-5 w-full border-b border-gray-300 dark:border-gray-600`}
 										>
 											<div className='flex gap-5 items-center'>
 												<BiSolidLike className='fill-yellow-700'/>
 												<h2
-													className={`font-medium text-gray-600`}>{value}</h2>
+													className={`font-medium text-gray-600 dark:text-gray-100`}>{value}</h2>
 											</div>
 											<FaInfoCircle
 												className={`flex justify-center items-center size-5 cursor-pointer ${
 													isLocked ? "blur-[2px]" : ""
 												}`}
 											/>
-										</motion.div>
+										</div>
 									))}
 								</div>
 							</motion.div>

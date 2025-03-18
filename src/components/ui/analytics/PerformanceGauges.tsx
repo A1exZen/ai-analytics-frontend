@@ -21,11 +21,11 @@ const PerformanceGauges: React.FC<IPerformanceGaugesProps> = ({
 			: performanceData.filter((item) => item.x === selectedDevice);
 
 	return (
-		<div className="bg-white p-4 rounded-xl shadow-md flex flex-col">
+		<div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col">
 			<div className="flex justify-between items-center">
-				<h2 className="font-medium text-gray-600">Показатели эффективности</h2>
+				<h2 className="font-medium text-foreground">Показатели Эффективности</h2>
 				<select
-					className="border border-gray-300 text-gray-600 text-sm rounded-lg py-2 px-2"
+					className="border border-gray-300 dark:border-gray-400 text-gray-600 dark:text-gray-200  text-sm rounded-lg py-2 px-2 dark:bg-gray-800"
 					value={selectedDevice}
 					onChange={(e) => setSelectedDevice(e.target.value as "All" | "Mobile" | "Desktop")}
 				>
@@ -45,7 +45,7 @@ const PerformanceGauges: React.FC<IPerformanceGaugesProps> = ({
 							colors={["#EA4228", "#F5CD19", "#5BE12C"]}
 							arcPadding={0.02}
 							percent={item.y / 100}
-							textColor="#000"
+							textColor="var(--foreground)"
 							className="font-bold"
 						/>
 						<p className="font-bold">{item.x === "Mobile" ? 'Телефон' : 'ПК' }</p>

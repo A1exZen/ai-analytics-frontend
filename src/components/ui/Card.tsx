@@ -1,6 +1,13 @@
 import {motion} from "framer-motion";
 import React from "react";
 import {MdLock} from "react-icons/md";
+import {FaRegQuestionCircle} from "react-icons/fa";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface CardProps {
 	title: string;
@@ -9,6 +16,8 @@ interface CardProps {
 	isPositive?: boolean;
 	isLocked: boolean;
 	customValue?: React.ReactNode;
+	className?: string;
+	tooltip?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -17,13 +26,15 @@ export const Card: React.FC<CardProps> = ({
 	                                          change,
 	                                          isPositive,
 	                                          isLocked,
-	                                          customValue
+	                                          customValue,
+	tooltip,
+	                                          className = "",
                                           }) => {
 	return (
 		<motion.div
-			className={`relative bg-white dark:bg-darkGray p-4 rounded-xl shadow-md flex flex-col justify-between gap-3 ${
+			className={`relative bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col justify-between gap-3 ${
 				isLocked ? "blur-[2px] opacity-50 cursor-not-allowed" : ""
-			}`}
+			} ${className}`}
 			whileHover={!isLocked ? {scale: 1.05} : {}}
 			transition={{type: "spring", stiffness: 250}}
 		>
@@ -32,11 +43,27 @@ export const Card: React.FC<CardProps> = ({
 					<MdLock size={32} className="text-gray-400"/>
 				</div>
 			)}
-			<h2
-				className={`font-medium ${isLocked ? "text-gray-400" : "text-gray-600 dark:text-gray-200"}`}>{title}</h2>
+			<div className='flex justify-between'>
+				<h2
+					className={`font-medium ${isLocked ? "text-gray-400" : "text-gray-600 dark:text-gray-200"}`}>{title}</h2>
+				{
+					tooltip && (
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger><FaRegQuestionCircle className='fill-gray-500 w-5 h-5'/></TooltipTrigger>
+								<TooltipContent className='text-xl'>
+									{tooltip}
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+
+
+					)
+				}
+			</div>
 			<div className="flex items-center gap-3">
 				{value && <p
-					className={`text-3xl font-bold text-gray-700 ${isLocked ? "text-gray-400" : ""}`}>{value.toLocaleString()}</p>}
+					className={`text-3xl font-bold text-gray-700 dark:text-gray-200 ${isLocked ? "text-gray-400" : ""}`}>{value.toLocaleString()}</p>}
 				{customValue && <div className="text-sm">{customValue}</div>}
 				{change && (
 					<p

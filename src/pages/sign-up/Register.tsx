@@ -62,9 +62,9 @@ export const Register = () => {
 	return (
 		<>
 			<div className='main' />
-			<div className='mt-[72px] flex flex-grow items-center justify-center w-fit'>
+			<div className='mt-[72px] flex grow items-center justify-center w-fit'>
 				<motion.div
-					className='relative md:w-[400px] max-w-xl bg-gray-100 bg-opacity-10 backdrop-blur-md dark:bg-opacity-10 dark:backdrop-blur-md dark:bg-gray-100 p-7 mx-7 md:mx-0 rounded-3xl shadow-xl flex flex-col gap-5 border-2 border-gray-200 dark:border-none dark:text-white'
+					className='relative md:w-[400px] max-w-xl bg-gray-100 bg-opacity-10 backdrop-blur-md dark:bg-opacity-10 dark:backdrop-blur-md dark:bg-zinc-800 p-7 mx-7 md:mx-0 rounded-3xl shadow-xl flex flex-col gap-5 border-2 border-gray-200 dark:border-none dark:text-white'
 					initial={{ y: 50, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					transition={{ type: "spring", stiffness: 50 }}
@@ -85,7 +85,7 @@ export const Register = () => {
 								name='email'
 								value={email}
 								onChange={e => setEmail(e.target.value)}
-								className='border border-grtarget.value-300 dark:border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400 dark:focus:border-blue-400  dark:bg-mainGray'
+								className='border border-grtarget.value-300 dark:border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-hidden focus:border-blue-400 dark:focus:border-blue-400  dark:bg-mainGray'
 							/>
 						</div>
 						<div className='flex flex-col gap-1'>
@@ -97,7 +97,7 @@ export const Register = () => {
 								name='password'
 								value={password}
 								onChange={e => setPassword(e.target.value)}
-								className='border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-400 dark:focus:border-blue-400  dark:bg-mainGray'
+								className='border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-hidden focus:border-blue-400 dark:focus:border-blue-400  dark:bg-mainGray'
 							/>
 						</div>
 						<button
@@ -109,9 +109,9 @@ export const Register = () => {
 					</form>
 
 					<div className='flex items-center'>
-						<hr className='flex-grow border-t border-gray-300' />
+						<hr className='grow border-t border-gray-300' />
 						<span className='px-4 text-gray-500 text-xs '>ИЛИ</span>
-						<hr className='flex-grow border-t border-gray-300' />
+						<hr className='grow border-t border-gray-300' />
 					</div>
 					<button
 						onClick={handleGoogleRegister}
@@ -125,7 +125,7 @@ export const Register = () => {
 							Уже есть учетная запись?{" "}
 							<Link
 								to='/sign-up/login'
-								className='text-blue-600 dark:text-blue-300'
+								className='text-blue-600 dark:text-blue-300 underline'
 							>
 								Авторизация
 							</Link>

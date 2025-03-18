@@ -24,13 +24,13 @@ const TrafficType: React.FC<ITrafficTypeProps> = ({
 
 	return (
 		<div
-			className="bg-white dark:bg-darkGray p-4 rounded-xl shadow-md flex flex-col justify-between items-center">
+			className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col justify-between items-center">
 			<div className="flex justify-between items-center w-full">
 				<h2 className="font-medium text-gray-600 dark:text-gray-200">
-					{selectedFilter === "Traffic" ? "Тип Трафика" : "Устройства"}
+					Тип Трафика
 				</h2>
 				<select
-					className="border border-gray-300 text-gray-600 text-sm rounded-lg py-2 px-2"
+					className="border dark:bg-gray-800 border-gray-300 dark:border-gray-400 text-gray-600 dark:text-gray-200 text-sm rounded-lg py-2 px-2"
 					value={selectedFilter}
 					onChange={(e) => setSelectedFilter(e.target.value as "Traffic" | "Devices")}
 				>
@@ -50,11 +50,10 @@ const TrafficType: React.FC<ITrafficTypeProps> = ({
 				/>
 					<VictoryLegend
 						orientation="horizontal"
-
 						itemsPerRow={3}
 						height={70}
 						gutter={20}
-						style={{labels: {fontSize: 16}}}
+						style={{labels: {fontSize: 16, fill: "var(--foreground)"}, }}
 						data={filteredData.map((d, i) => ({
 							name: d.x,
 							symbol: {fill: COLORS[i]},

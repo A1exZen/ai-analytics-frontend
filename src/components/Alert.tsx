@@ -57,7 +57,7 @@ const Alert: React.FC<AlertProps> = ({
 					<span>{message}</span>
 					<button
 						onClick={handleClose}
-						className='ml-4 text-lg font-bold focus:outline-none'
+						className='ml-4 text-lg font-bold focus:outline-hidden'
 					>
 						&times;
 					</button>

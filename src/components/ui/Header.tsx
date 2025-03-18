@@ -111,7 +111,7 @@ const Header: React.FC = () => {
 				{/*Burger*/}
 				<div className='md:hidden flex items-center'>
 					<button
-						className='p-2 focus:outline-none'
+						className='p-2 focus:outline-hidden'
 						onClick={toggleMenu}
 						aria-label='Toggle Menu'
 					>
