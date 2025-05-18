@@ -2,7 +2,7 @@
 .env
 logs
 *.log
-npm-debug.log*
+npm-debug.log*x
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*

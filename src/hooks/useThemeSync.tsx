@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useThemeStore from "../zustand/useThemeStore";
+import useThemeStore from "../zustand/useThemeStore.ts";
 
 const useThemeSync = () => {
 	const { theme } = useThemeStore();

@@ -3,7 +3,7 @@ import useLoadingStore from "../zustand/useLoadingStore";
 import axios from "axios";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { uploadImg } from "@/assets/index.js";
+import { uploadImg } from "@/assets";
 
 export const UploadPDF = () => {
 	const [file, setFile] = useState<File | null>(null);

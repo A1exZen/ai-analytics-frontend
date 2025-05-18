@@ -1,31 +1,42 @@
-
-
 import { motion } from "framer-motion";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import useThemeStore from "../../zustand/useThemeStore";
-import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase";
 import toast from "react-hot-toast";
 import useUserStore from "../../zustand/useUserStore";
-import {logo} from '@/assets/index.js'
+import {
+	useAnalysisStore
+} from "@/zustand/useAnalysisStore.ts";
+import { logo } from '@/assets/index.ts';
 
 const Header: React.FC = () => {
-	const location = useLocation();
+	const navigate = useNavigate();
 	const { theme, toggleTheme } = useThemeStore();
-	const { user } = useUserStore();
+	const { user, logout } = useUserStore();
+	const { clearHistory } = useAnalysisStore();
 
 	const [menuOpen, setMenuOpen] = useState(false);
+	const [dropdownOpen, setDropdownOpen] = useState(false);
+
 	const toggleMenu = () => setMenuOpen(!menuOpen);
+	const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
 	const handleSignOut = async () => {
 		try {
-			await signOut(auth);
+			logout();
+			navigate("/");
 			toast.success("Вы вышли из аккаунта!");
 		} catch (error) {
 			toast.error("Ошибка при выходе.");
 			console.error("Error signing out:", error);
 		}
+	};
+
+
+	const handleClearHistory = () => {
+		clearHistory();
+		toast.success("История анализов очищена!");
+		setDropdownOpen(false);
 	};
 
 	return (
@@ -54,22 +65,26 @@ const Header: React.FC = () => {
 							ease: "easeInOut",
 						}}
 					/>
-					<span className='uppercase text-center dark_blue_gradient font-black text-2xl'>
-						Analytics
-					</span>
+					<span
+						className='uppercase text-center dark_blue_gradient font-black text-2xl'>
+            Analytics
+          </span>
 				</Link>
-				{/*Desktop*/}
+				{/* Desktop */}
 				<div className='hidden md:flex gap-8 items-center font-semibold'>
-					<NavLink
-						to='/upload-pdf'
-						className={({ isActive }) =>
-							`nav__link ${
-								isActive ? "text-blue-700 dark:text-blue-400 before:w-full" : ""
-							}`
-						}
-					>
-						Анализ PDF
-					</NavLink>
+					{user && (
+						<NavLink
+							to='/analytics'
+							className={({ isActive }) =>
+								`nav__link ${
+									isActive ? "text-blue-700 dark:text-blue-400 before:w-full" : ""
+								}`
+							}
+						>
+							Анализ
+						</NavLink>
+					)}
+
 					<NavLink
 						to='/contacts'
 						className={({ isActive }) =>
@@ -85,12 +100,54 @@ const Header: React.FC = () => {
 							Тарифы
 						</NavLink>
 						{user ? (
-							<Link to='/' className='main_btn_outline' onClick={handleSignOut}>
-								Выход
-							</Link>
+							<div className="relative">
+								<button
+									onClick={toggleDropdown}
+									className='cursor-pointer main_btn_outline flex items-center gap-2'
+								>
+									Действия
+									<svg
+										className={`w-4 h-4 transform transition-transform ${
+											dropdownOpen ? "rotate-180" : ""
+										}`}
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+											d="M19 9l-7 7-7-7"
+										/>
+									</svg>
+								</button>
+								{dropdownOpen && (
+									<motion.div
+										className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-900 z-50"
+										initial={{ opacity: 0, y: -10 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ duration: 0.2 }}
+									>
+										<button
+											onClick={handleClearHistory}
+											className="cursor-pointer w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors"
+										>
+											Удалить историю
+										</button>
+										<button
+											onClick={handleSignOut}
+											className="cursor-pointer w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-b-lg transition-colors"
+										>
+											Выход
+										</button>
+									</motion.div>
+								)}
+							</div>
 						) : (
 							<NavLink to='/sign-up/login' className='main_btn'>
-								Авторизация
+								Войти
 							</NavLink>
 						)}
 					</div>
@@ -100,15 +157,15 @@ const Header: React.FC = () => {
 							onClick={toggleTheme}
 							className='relative inline-flex items-center h-6 rounded-full w-11 bg-gray-300 dark:bg-gray-600 transition-colors'
 						>
-							<span
-								className={`${
-									theme === "light" ? "translate-x-6" : "translate-x-1"
-								} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-							/>
+              <span
+	              className={`${
+		              theme === "light" ? "translate-x-6" : "translate-x-1"
+	              } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+              />
 						</button>
 					</div>
 				</div>
-				{/*Burger*/}
+				{/* Burger */}
 				<div className='md:hidden flex items-center'>
 					<button
 						className='p-2 focus:outline-hidden'
@@ -121,10 +178,9 @@ const Header: React.FC = () => {
 					</button>
 				</div>
 			</nav>
-			{/* Mobile Menu */}
 			{menuOpen && (
 				<motion.div
-					className='w-full bg-white dark:bg-backgroundDark absolute top-14 left-0 px-7 py-6 shadow-md flex flex-col gap-4 md:hidden'
+					className='w-full bg-white dark:bg-background border-b-2 border-gray-600 absolute top-14 left-0 px-7 py-6 shadow-md flex flex-col gap-4 md:hidden'
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ type: "spring", stiffness: 50 }}
@@ -132,11 +188,11 @@ const Header: React.FC = () => {
 					<div className='flex justify-between items-center gap-5'>
 						<div className='flex-1 flex flex-col gap-3'>
 							<Link
-								to='/about-us'
+								to='/analytics'
 								className='nav__link text-lg'
 								onClick={() => setMenuOpen(false)}
 							>
-								О нас
+								Анализ
 							</Link>
 							<Link
 								to='/contacts'
@@ -152,11 +208,11 @@ const Header: React.FC = () => {
 								onClick={toggleTheme}
 								className='relative inline-flex items-center h-6 rounded-full w-11 bg-gray-300 dark:bg-gray-600 transition-colors'
 							>
-								<span
-									className={`${
-										theme === "light" ? "translate-x-6" : "translate-x-1"
-									} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-								/>
+                <span
+	                className={`${
+		                theme === "light" ? "translate-x-6" : "translate-x-1"
+	                } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+                />
 							</button>
 						</div>
 					</div>
@@ -168,22 +224,59 @@ const Header: React.FC = () => {
 						Тарифы
 					</NavLink>
 					{user ? (
+						<div className="relative">
+							<button
+								onClick={toggleDropdown}
+								className='main_btn w-full flex justify-center items-center gap-2'
+							>
+								Действия
+								<svg
+									className={`w-4 h-4 transform transition-transform ${
+										dropdownOpen ? "rotate-180" : ""
+									}`}
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="2"
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</button>
+							{dropdownOpen && (
+								<motion.div
+									className="mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-900 z-50"
+									initial={{ opacity: 0, y: -10 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.2 }}
+								>
+									<button
+										onClick={handleSignOut}
+										className="w-full text-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors"
+									>
+										Выход
+									</button>
+									<button
+										onClick={handleClearHistory}
+										className="w-full text-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg transition-colors"
+									>
+										Удалить историю
+									</button>
+								</motion.div>
+							)}
+						</div>
+					) : (
 						<NavLink
 							to='/sign-up/login'
-							type='button'
 							className='main_btn w-full flex justify-center'
 							onClick={() => setMenuOpen(false)}
 						>
 							Авторизация
 						</NavLink>
-					) : (
-						<Link
-							to='/'
-							className='main_btn w-full text-center'
-							onClick={handleSignOut}
-						>
-							Выход
-						</Link>
 					)}
 				</motion.div>
 			)}

@@ -9,8 +9,8 @@ interface ITrafficItem {
 const COLORS = ["#0088FE", "#00C49F", "#ff8528", "#8b5eda", "#da5e73"];
 
 interface ITrafficTypeProps {
-	trafficData: ITrafficItem[]; // Данные по источникам трафика
-	deviceData: ITrafficItem[];  // Данные по устройствам
+	trafficData: ITrafficItem[];
+	deviceData: ITrafficItem[];
 }
 
 const TrafficType: React.FC<ITrafficTypeProps> = ({

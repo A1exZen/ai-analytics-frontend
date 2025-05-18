@@ -35,7 +35,7 @@ export const Card: React.FC<CardProps> = ({
 			className={`relative bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col justify-between gap-3 ${
 				isLocked ? "blur-[2px] opacity-50 cursor-not-allowed" : ""
 			} ${className}`}
-			whileHover={!isLocked ? {scale: 1.05} : {}}
+			whileHover={!isLocked ? {scale: 1.02} : {}}
 			transition={{type: "spring", stiffness: 250}}
 		>
 			{isLocked && (

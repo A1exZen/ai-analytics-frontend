@@ -1,4 +1,3 @@
-// Оставляем PageSpeed без изменений
 export interface PageSpeedMetrics {
 	serverResponseTime: string;
 	totalByteWeight: string;
@@ -165,7 +164,53 @@ export interface OpenAIAnalysis {
 	recommendations: OpenAIAnalysisRecommendations;
 }
 
+export interface LighthouseMetrics {
+	firstContentfulPaint: string;
+	largestContentfulPaint: string;
+	totalBlockingTime: string;
+	cumulativeLayoutShift: string;
+	speedIndex: string;
+}
+
+export interface LighthouseResult {
+	performance: number;
+	accessibility: number;
+	bestPractices: number;
+	seo: number;
+	metrics: LighthouseMetrics;
+}
+
+// export interface SecurityHeadersResult {
+// 	grade: string; // Оценка (A+, A, B и т.д.)
+// 	headers: string[]; // Список заголовков
+// 	status: string; // Статус анализа
+// }
+//
+// export interface VirusTotalResult {
+// 	status: string;
+// 	positives: number;
+// 	total: number;
+// 	isMalicious: boolean;
+// }
+
 export interface Data {
 	pageSpeed: PageSpeed;
 	openAIAnalysis: OpenAIAnalysis;
+	lighthouse: LighthouseResult;
+}
+
+export interface ApiError {
+	message: string;
+	status?: number;
+	data?: Data;
+}
+export interface ErrorResponse {
+	message: string;
+}
+
+export interface Analysis {
+	id: string;
+	url: string;
+	data: Data;
+	createdAt: string;
 }

@@ -246,7 +246,7 @@
 
 .main_btn_outline {
 	border-radius: 0.75rem;
-	border: 1px solid #b91c1c; /* red-700 */
+	border: 1px solid #1c5bb9; /* red-700 */
 	background-color: transparent;
 	padding: 0.5rem 1rem;
 	font-weight: 600;
@@ -259,7 +259,7 @@
 }
 
 .main_btn_outline:hover {
-	background-color: #fee2e2; /* red-100 */
+	background-color: #e5f7ff; /* red-100 */
 	color: black;
 }
 

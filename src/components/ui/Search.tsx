@@ -1,74 +1,37 @@
 import { IoClose, IoSearch } from "react-icons/io5";
 import React, { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { motion } from "framer-motion";
 import useLoadingStore from "../../zustand/useLoadingStore";
 import toast from "react-hot-toast";
 import { getRootUrl } from "@/utils/getRootUrl.ts";
-import { auth, fireDB } from "@/config/firebase.ts"; // Импортируем Firebase
-import { useAuthState } from "react-firebase-hooks/auth";
-import { doc, setDoc, collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import useUserStore from "@/zustand/useUserStore.ts";
+import { useAnalysisStore } from "@/zustand/useAnalysisStore.ts";
+import {Analysis} from "@/types/types.ts";
+import {createAnalysis} from "@/api/analyzeApi.ts";
+
+const fadeIn = {
+	hidden: { opacity: 0, y: 50 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: { duration: 0.8, ease: "easeOut"},
+	},
+};
 
 interface SearchProps {
 	setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
-
-interface SearchResponse {
-	message: string;
-	data: any;
-}
-
-interface Analysis {
-	id: string;
-	type: string;
-	identifier: string;
-	result: any;
-	timestamp: string;
-}
-
-export const Search: React.FC<SearchProps> = ({ setError }) => {
+const Search: React.FC<SearchProps> = ({ setError }) => {
 	const { startLoading, stopLoading } = useLoadingStore();
 	const [url, setUrl] = useState("");
 	const navigate = useNavigate();
-	const [searchHistory, setSearchHistory] = useState<string[]>([]); // История поиска (для всех)
+	const [searchHistory, setSearchHistory] = useState<string[]>([]);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-	const [user] = useAuthState(auth); // Получаем текущего пользователя
-	const [showAnalysisHistory, setShowAnalysisHistory] = useState(false); // Состояние для отображения истории анализа
+	const { user, token } = useUserStore();
+	const { setCurrentAnalysis, addToCache, setAnalysisHistory, analysisHistory } = useAnalysisStore();
 
-	// Проверка, существует ли анализ в Firestore
-	const checkExistingAnalysis = async (url: string) => {
-		if (!user) return null;
-
-		const userAnalysesRef = collection(fireDB, `analyses/${user.uid}/userAnalyses`);
-		const q = query(userAnalysesRef, where("type", "==", "url"), where("identifier", "==", url));
-		const querySnapshot = await getDocs(q);
-
-		if (!querySnapshot.empty) {
-			const doc = querySnapshot.docs[0];
-			return doc.data().result as any;
-		}
-		return null;
-	};
-
-	// Сохранение анализа в Firestore
-	const saveAnalysisToFirestore = async (url: string, analysisResult: any) => {
-		if (!user) {
-			toast.error("Пожалуйста, авторизуйтесь, чтобы сохранить анализ.");
-			return;
-		}
-
-		const analysisRef = doc(collection(fireDB, `analyses/${user.uid}/userAnalyses`));
-		await setDoc(analysisRef, {
-			type: "url",
-			identifier: url,
-			result: analysisResult,
-			timestamp: new Date().toISOString(),
-		});
-	};
-
-	// Загрузка истории поиска из localStorage (для всех пользователей)
 	useEffect(() => {
 		const savedHistory = localStorage.getItem("searchHistory");
 		if (savedHistory) {
@@ -76,19 +39,13 @@ export const Search: React.FC<SearchProps> = ({ setError }) => {
 		}
 	}, []);
 
-	// Загрузка истории анализа из Firestore (только для авторизованных)
-	const fetchAnalysisHistory = async () => {
-		if (!user) return [];
+	const checkCachedAnalysis = (url: string): Analysis | null => {
+		return useAnalysisStore.getState().cachedAnalyses.find((analysis) => analysis.url === url) || null;
+	};
 
-		const userAnalysesRef = collection(fireDB, `analyses/${user.uid}/userAnalyses`);
-		const q = query(userAnalysesRef, where("type", "==", "url"), orderBy("timestamp", "desc"));
-		const querySnapshot = await getDocs(q);
-
-		const analyses: Analysis[] = [];
-		querySnapshot.forEach((doc) => {
-			analyses.push({ id: doc.id, ...doc.data() } as Analysis);
-		});
-		return analyses;
+	const saveToCache = (analysis: Analysis) => {
+		addToCache(analysis);
+		localStorage.setItem("cachedAnalyses", JSON.stringify(useAnalysisStore.getState().cachedAnalyses));
 	};
 
 	const isValidUrl = (url: string): boolean => {
@@ -103,62 +60,49 @@ export const Search: React.FC<SearchProps> = ({ setError }) => {
 			stopLoading();
 			return;
 		}
+		if (!user || !token) {
+			toast.error("Пожалуйста, авторизуйтесь для выполнения анализа.");
+			stopLoading();
+			return;
+		}
+
 		setError(null);
 		startLoading();
 		const query = getRootUrl(url);
-		console.log("Searching for query:", query);
 
-		// Проверяем, есть ли уже анализ для этого URL
-		const existingAnalysis = await checkExistingAnalysis(query);
-		if (existingAnalysis) {
+		const cachedAnalysis = checkCachedAnalysis(query);
+		if (cachedAnalysis) {
 			stopLoading();
-			navigate("/analytics", {
-				state: {
-					query,
-					data: existingAnalysis,
-				},
-			});
-			toast.success("Анализ загружен из истории!");
+			setCurrentAnalysis(cachedAnalysis);
+			navigate(`/analytics/${cachedAnalysis.id}`);
+			toast.success("Анализ загружен из кэша!");
 			return;
 		}
 
 		try {
-			const response = await axios.post<SearchResponse>(
-				"http://localhost:5001/api/analyze",
-				{
-					query,
-				}
-			);
-
-			const data = response.data.data;
+			const response = await createAnalysis(query);
+			console.log("Raw response data:", response);
+			const { id, data } = response;
 			stopLoading();
-			navigate("/analytics", {
-				state: {
-					query,
-					data,
-				},
-			});
-			console.log("DATA:", data);
+			const newAnalysis: Analysis = {
+				id,
+				url: query,
+				data,
+				createdAt: new Date().toISOString(),
+			};
+			setCurrentAnalysis(newAnalysis);
+			saveToCache(newAnalysis);
 
-			// Сохраняем анализ в Firestore для авторизованных пользователей
-			if (user) {
-				await saveAnalysisToFirestore(query, data);
-			}
+			const updatedAnalysisHistory = [newAnalysis, ...analysisHistory].slice(0, 5);
+			setAnalysisHistory(updatedAnalysisHistory);
 
-			// Обновляем историю поиска в localStorage для всех пользователей
-			const updatedHistory = [url, ...searchHistory.filter((item) => item !== url)].slice(0, 5);
-			setSearchHistory(updatedHistory);
-			localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
-			setIsDropdownOpen(false);
+			const updatedSearchHistory = [url, ...searchHistory.filter((item) => item !== url)].slice(0, 5);
+			setSearchHistory(updatedSearchHistory);
+			localStorage.setItem("searchHistory", JSON.stringify(updatedSearchHistory));
+			navigate(`/analytics/${id}`);
 		} catch (error: any) {
 			console.error("Error while searching:", error);
-			if (error.response) {
-				toast.error(`Ошибка: ${error.response.data.message}`);
-			} else if (error.request) {
-				toast.error("Ошибка при подключении к серверу. Попробуйте позже.");
-			} else {
-				toast.error("Ошибка при поиске. Попробуйте позже.");
-			}
+			toast.error(error.message);
 			stopLoading();
 		}
 	};
@@ -174,109 +118,73 @@ export const Search: React.FC<SearchProps> = ({ setError }) => {
 		setIsDropdownOpen(false);
 	};
 
-	// Переключение отображения истории анализа
-	const toggleAnalysisHistory = async () => {
-		if (!user) {
-			toast.error("Пожалуйста, авторизуйтесь, чтобы просмотреть историю анализа.");
-			return;
-		}
-		setShowAnalysisHistory(!showAnalysisHistory);
-		if (!showAnalysisHistory) {
-			const analyses = await fetchAnalysisHistory();
-			// Здесь можно добавить отображение анализа (например, в модальном окне или новом компоненте)
-			console.log("Analysis History:", analyses);
-			toast.success("История анализа загружена!");
-		}
-	};
-
 	return (
-		<div className="flex flex-col max-w-3xl w-full gap-2">
-			<form className="form relative" onSubmit={handleSearch}>
-				<button
-					type="submit"
-					className="absolute left-3 -translate-y-1/2 top-1/2 p-1"
-				>
-					<IoSearch size={20} className="dark:fill-white cursor-pointer" />
-				</button>
-				<input
-					className="w-full input rounded-xl px-10 py-3 border-2 border-gray-200 dark:border-gray-800 focus:outline-hidden focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md bg-gray-50 dark:bg-gray-700 dark:text-white"
-					placeholder="Поиск..."
-					type="text"
-					value={url}
-					onChange={(e) => setUrl(e.target.value)}
-					onFocus={() => setIsDropdownOpen(true)}
-					onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-				/>
-				<button
-					onClick={() => setUrl("")}
-					type="reset"
-					className={`absolute transition duration-500 -translate-y-1/2 top-1/2 p-1 ${
-						isDropdownOpen ? "-translate-x-[70px]" : "-translate-x-10"
-					}`}
-				>
-					<IoClose
-						size={20}
-						className="hover:rotate-90 transition duration-500 dark:fill-white"
+		<motion.section
+			className="px-4 sm:px-6 lg:px-8 max-w-5xl md:w-3xl mx-auto relative"
+			initial="hidden"
+			whileInView="visible"
+			viewport={{ amount: 0.5, once:true }}
+		>
+			<motion.form className="relative" onSubmit={handleSearch} variants={fadeIn}>
+				<div className="relative flex items-center">
+					<IoSearch size={20} className="absolute left-4 text-gray-500 dark:text-gray-400" />
+					<input
+						className="w-full pl-12 pr-24 py-3 rounded-xl bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-gray-200/30 dark:border-gray-700/30 focus:outline-none focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500 text-gray-800 dark:text-gray-200 transition-all duration-300 shadow-md"
+						placeholder="Введите URL для анализа..."
+						type="text"
+						value={url}
+						onChange={(e) => setUrl(e.target.value)}
+						onFocus={() => setIsDropdownOpen(true)}
+						onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
 					/>
-				</button>
-				<button
-					type="button"
-					className={`absolute transition duration-500 right-3 -translate-y-1/2 top-1/2 p-1 ${
-						isDropdownOpen ? "" : "hidden"
-					}`}
-				>
-					<RiDeleteBinLine
-						size={20}
-						className="transition hover:rotate-45 duration-300 dark:fill-white"
-						onClick={clearSearchHistory}
-					/>
-				</button>
-			</form>
-			{isDropdownOpen && searchHistory.length > 0 && (
-				<motion.ul
-					className="mt-2 bg-white dark:bg-gray-800 border border-border rounded-lg shadow-md"
-					initial={{ opacity: 0, y: -15 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{
-						duration: 0.5,
-					}}
-				>
-					{searchHistory
-						.filter((item) => item.includes(url))
-						.map((item, index) => (
-							<li
-								key={index}
-								className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-lg"
-								onMouseDown={() => handleSelectHistory(item)}
-							>
-								{item}
-							</li>
-						))}
-				</motion.ul>
-			)}
-			{/* Кнопка для отображения истории анализа */}
-			{user && (
-				<button
-					onClick={toggleAnalysisHistory}
-					className="mt-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-				>
-					{showAnalysisHistory ? "Скрыть историю анализа" : "Показать историю анализа"}
-				</button>
-			)}
-			{/* Место для отображения истории анализа (можно улучшить с модальным окном) */}
-			{showAnalysisHistory && user && (
-				<div className="mt-2 p-4 border border-gray-300 bg-gray-50 dark:bg-gray-800 rounded max-w-xl">
-					<h3 className="font-bold text-lg mb-2 text-gray-800 dark:text-gray-200">
-						История анализа
-					</h3>
-					{/* Здесь можно отобразить анализы */}
-					{/* Пока только лог для демонстрации */}
-					<p className="text-gray-700 dark:text-gray-200">
-						Загрузите историю анализа в модальное окно или компонент для отображения.
-					</p>
+					{url && (
+						<button
+							onClick={() => setUrl("")}
+							type="reset"
+							className="absolute right-12 p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition duration-300"
+						>
+							<IoClose size={20} className="hover:rotate-90 transition duration-300" />
+						</button>
+					)}
+					<button
+						type="submit"
+						className="absolute right-3 p-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-300"
+					>
+						<IoSearch size={20} />
+					</button>
 				</div>
-			)}
-		</div>
+
+				{isDropdownOpen && searchHistory.length > 0 && (
+					<motion.ul
+						className="absolute w-full mt-2 bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-gray-200/30 dark:border-gray-700/30 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+						initial={{ opacity: 0, y: -15 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.3 }}
+					>
+						<li className="flex justify-between items-center px-4 py-2 border-b border-gray-200/30 dark:border-gray-700/30">
+							<span className="text-gray-700 dark:text-gray-300 font-semibold">История поиска</span>
+							<button
+								onClick={clearSearchHistory}
+								className="p-1 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition duration-300"
+							>
+								<RiDeleteBinLine size={20} className="hover:rotate-45 transition duration-300" />
+							</button>
+						</li>
+						{searchHistory
+							.filter((item) => item.includes(url))
+							.map((item, index) => (
+								<li
+									key={index}
+									className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 cursor-pointer rounded-lg transition duration-200"
+									onMouseDown={() => handleSelectHistory(item)}
+								>
+									{item}
+								</li>
+							))}
+					</motion.ul>
+				)}
+			</motion.form>
+		</motion.section>
 	);
 };
 
