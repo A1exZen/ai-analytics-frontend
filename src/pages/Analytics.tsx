@@ -45,8 +45,7 @@ const Analytics: React.FC = () => {
 		const {url, data} = currentAnalysis;
 		const {
 			pageSpeed,
-			openAIAnalysis,
-			lighthouse
+			openAIAnalysis
 		}: Data = data
 		const {metrics} = pageSpeed;
 
@@ -516,63 +515,64 @@ const Analytics: React.FC = () => {
 										<span className="mr-2 text-blue-500">📊</span> Анализ
 										производительности (Lighthouse)
 									</h3>
-									{lighthouse ? (
-										<div
-											className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 dark:text-gray-300">
-											<div className="space-y-3">
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Производительность:</span>
-													<span
-														className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.performance}</span>
-												</p>
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Доступность:</span>
-													<span
-														className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.accessibility}</span>
-												</p>
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Лучшие практики:</span>
-													<span
-														className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.bestPractices}</span>
-												</p>
-												<p className="flex justify-between items-center">
-													<span className="font-medium">SEO:</span>
-													<span
-														className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.seo}</span>
-												</p>
-											</div>
-											<div className="space-y-3">
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Первый контент:</span>
-													<span
-														className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.firstContentfulPaint}</span>
-												</p>
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Крупнейший контент:</span>
-													<span
-														className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.largestContentfulPaint}</span>
-												</p>
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Время блокировки:</span>
-													<span
-														className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.totalBlockingTime}</span>
-												</p>
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Смещение макета:</span>
-													<span
-														className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.cumulativeLayoutShift}</span>
-												</p>
-												<p className="flex justify-between items-center">
-													<span className="font-medium">Индекс скорости:</span>
-													<span
-														className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.speedIndex}</span>
-												</p>
-											</div>
-										</div>
-									) : (
-										<p className="text-gray-500 dark:text-gray-400">Данные анализа
-											недоступны.</p>
-									)}
+									{/*{lighthouse ? (*/}
+									{/*	<div*/}
+									{/*		className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 dark:text-gray-300">*/}
+									{/*		<div className="space-y-3">*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Производительность:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.performance}</span>*/}
+									{/*			</p>*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Доступность:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.accessibility}</span>*/}
+									{/*			</p>*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Лучшие практики:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.bestPractices}</span>*/}
+									{/*			</p>*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">SEO:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-blue-600 dark:text-blue-400 text-right">{lighthouse.seo}</span>*/}
+									{/*			</p>*/}
+									{/*		</div>*/}
+									{/*		<div className="space-y-3">*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Первый контент:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.firstContentfulPaint}</span>*/}
+									{/*			</p>*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Крупнейший контент:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.largestContentfulPaint}</span>*/}
+									{/*			</p>*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Время блокировки:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.totalBlockingTime}</span>*/}
+									{/*			</p>*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Смещение макета:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.cumulativeLayoutShift}</span>*/}
+									{/*			</p>*/}
+									{/*			<p className="flex justify-between items-center">*/}
+									{/*				<span className="font-medium">Индекс скорости:</span>*/}
+									{/*				<span*/}
+									{/*					className="font-semibold text-indigo-600 dark:text-indigo-400 text-right">{lighthouse.metrics.speedIndex}</span>*/}
+									{/*			</p>*/}
+									{/*		</div>*/}
+									{/*	</div>*/}
+									{/*) : (*/}
+
+									{/*)}*/}
+									<p className="text-gray-500 dark:text-gray-400">Данные анализа
+										недоступны.</p>
 								</li>
 							</ol>
 						</section>

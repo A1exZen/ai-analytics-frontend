@@ -164,21 +164,21 @@ export interface OpenAIAnalysis {
 	recommendations: OpenAIAnalysisRecommendations;
 }
 
-export interface LighthouseMetrics {
-	firstContentfulPaint: string;
-	largestContentfulPaint: string;
-	totalBlockingTime: string;
-	cumulativeLayoutShift: string;
-	speedIndex: string;
-}
+// export interface LighthouseMetrics {
+// 	firstContentfulPaint: string;
+// 	largestContentfulPaint: string;
+// 	totalBlockingTime: string;
+// 	cumulativeLayoutShift: string;
+// 	speedIndex: string;
+// }
 
-export interface LighthouseResult {
-	performance: number;
-	accessibility: number;
-	bestPractices: number;
-	seo: number;
-	metrics: LighthouseMetrics;
-}
+// export interface LighthouseResult {
+// 	performance: number;
+// 	accessibility: number;
+// 	bestPractices: number;
+// 	seo: number;
+// 	metrics: LighthouseMetrics;
+// }
 
 // export interface SecurityHeadersResult {
 // 	grade: string; // Оценка (A+, A, B и т.д.)
@@ -196,7 +196,6 @@ export interface LighthouseResult {
 export interface Data {
 	pageSpeed: PageSpeed;
 	openAIAnalysis: OpenAIAnalysis;
-	lighthouse: LighthouseResult;
 }
 
 export interface ApiError {
