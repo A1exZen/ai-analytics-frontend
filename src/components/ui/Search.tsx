@@ -9,7 +9,7 @@ import { getRootUrl } from "@/utils/getRootUrl.ts";
 import useUserStore from "@/zustand/useUserStore.ts";
 import { useAnalysisStore } from "@/zustand/useAnalysisStore.ts";
 import {Analysis} from "@/types/types.ts";
-import {createAnalysis} from "@/api/analyzeApi.ts";
+import {checkTaskStatus, startAnalysis} from "@/api/analyzeApi.ts";
 
 const fadeIn = {
 	hidden: { opacity: 0, y: 50 },
@@ -80,34 +80,53 @@ const Search: React.FC<SearchProps> = ({ setError }) => {
 		}
 
 		try {
-			const response = await createAnalysis(query);
-			console.log("Raw response data:", response);
-			const { id, data } = response;
-			stopLoading();
-			const newAnalysis: Analysis = {
-				id,
-				url: query,
-				data,
-				createdAt: new Date().toISOString(),
-			};
-			setCurrentAnalysis(newAnalysis);
-			saveToCache(newAnalysis);
+			const { taskId } = await startAnalysis(query);
+			const interval = setInterval(async () => {
+				try {
+					const taskStatus = await checkTaskStatus(taskId);
+					if (taskStatus.status === "completed" && taskStatus.result) {
+						clearInterval(interval);
+						stopLoading();
+						const newAnalysis: Analysis = {
+							id: taskId,
+							url: query,
+							data: taskStatus.result,
+							createdAt: new Date().toISOString(),
+						};
+						setCurrentAnalysis(newAnalysis);
+						saveToCache(newAnalysis);
 
-			const updatedAnalysisHistory = [newAnalysis, ...analysisHistory].slice(0, 5);
-			setAnalysisHistory(updatedAnalysisHistory);
+						const updatedAnalysisHistory = [newAnalysis, ...analysisHistory].slice(0, 5);
+						setAnalysisHistory(updatedAnalysisHistory);
 
-			const updatedSearchHistory = [url, ...searchHistory.filter((item) => item !== url)].slice(0, 5);
-			setSearchHistory(updatedSearchHistory);
-			localStorage.setItem("searchHistory", JSON.stringify(updatedSearchHistory));
-			navigate(`/analytics/${id}`);
+						const updatedSearchHistory = [url, ...searchHistory.filter((item) => item !== url)].slice(0, 5);
+						setSearchHistory(updatedSearchHistory);
+						localStorage.setItem("searchHistory", JSON.stringify(updatedSearchHistory));
+						navigate(`/analytics/${taskId}`);
+					} else if (taskStatus.status === "failed") {
+						clearInterval(interval);
+						stopLoading();
+						toast.error(taskStatus.error || "Произошла ошибка при выполнении анализа.");
+					}
+				} catch (error: unknown) {
+					clearInterval(interval);
+					stopLoading();
+					console.error("Error while checking task status:", error);
+					if (error instanceof Error) {
+						toast.error(error.message);
+					} else {
+						toast.error("Произошла неизвестная ошибка.");
+					}
+				}
+			}, 3000);
 		} catch (error: unknown) {
-			console.error("Error while searching:", error);
+			stopLoading();
+			console.error("Error while starting analysis:", error);
 			if (error instanceof Error) {
 				toast.error(error.message);
 			} else {
 				toast.error("Произошла неизвестная ошибка.");
 			}
-			stopLoading();
 		}
 	};
 
