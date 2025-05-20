@@ -12,6 +12,7 @@ import useUserStore from "../zustand/useUserStore.ts";
 import { useNavigate } from "react-router-dom";
 import {Analysis} from "@/types/types.ts";
 import ScrollToTop from "@/utils/ScrollToTop.tsx";
+import {fetchAllAnalyses} from "@/api/analyzeApi.ts";
 
 
 const dropdownVariants = {
@@ -28,6 +29,39 @@ const HomeAnalytics: React.FC = () => {
 	const navigate = useNavigate();
 	const menuRef = useRef<HTMLDivElement>(null);
 	const buttonRef = useRef<HTMLButtonElement>(null);
+	const [allAnalyses, setAllAnalyses] = useState<Analysis[]>([]);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				menuRef.current &&
+				!menuRef.current.contains(event.target as Node) &&
+				buttonRef.current &&
+				!buttonRef.current.contains(event.target as Node)
+			) {
+				setShowAnalysisHistory(false);
+			}
+		};
+
+		if (showAnalysisHistory) {
+			const loadAnalyses = async () => {
+				try {
+					const analyses = await fetchAllAnalyses();
+					setAllAnalyses(analyses);
+				} catch (err) {
+					toast.error((err as Error).message || "Ошибка загрузки истории");
+				}
+			};
+			loadAnalyses();
+			document.addEventListener("mousedown", handleClickOutside);
+		} else {
+			setAllAnalyses([]); // Очистка при закрытии
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [showAnalysisHistory]);
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -109,7 +143,6 @@ const HomeAnalytics: React.FC = () => {
 					</h2>
 				</div>
 
-				{/* Кнопка истории */}
 				{user && (
 					<div className="absolute top-4 right-4 z-20">
 						<motion.button
@@ -131,11 +164,11 @@ const HomeAnalytics: React.FC = () => {
 								animate="visible"
 							>
 								<h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 px-4 py-3 border-b border-gray-200/30 dark:border-gray-700/30">
-									История анализа
+									История анализа (все пользователи)
 								</h3>
-								{useAnalysisStore.getState().analysisHistory.length > 0 ? (
+								{allAnalyses.length > 0 ? (
 									<div className="py-2">
-										{useAnalysisStore.getState().analysisHistory.map((analysis) => (
+										{allAnalyses.map((analysis) => (
 											<motion.div
 												key={analysis.id}
 												className="px-4 py-2 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition duration-200"

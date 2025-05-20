@@ -192,6 +192,11 @@ export interface OpenAIAnalysis {
 // 	total: number;
 // 	isMalicious: boolean;
 // }
+export interface AnalysisHistoryItem {
+	id: string;
+	url: string;
+	createdAt: Date;
+}
 
 export interface Data {
 	pageSpeed: PageSpeed;

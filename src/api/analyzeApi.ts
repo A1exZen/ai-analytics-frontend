@@ -1,4 +1,9 @@
-import {Analysis, Data, ErrorResponse} from "../types/types";
+import {
+	Analysis,
+	AnalysisHistoryItem,
+	Data,
+	ErrorResponse
+} from "../types/types";
 import {AxiosError} from "axios";
 import api from "@/config/axios.ts";
 
@@ -18,15 +23,24 @@ interface TaskStatusResponse {
 	error?: string;
 }
 
-export const fetchAnalysisHistory = async (): Promise<Analysis[]> => {
+export const fetchAnalysisHistory = async (): Promise<AnalysisHistoryItem[]> => {
 	try {
-		const response = await api.get<Analysis[]>("/api/analyze");
+		const response = await api.get<AnalysisHistoryItem[]>("/api/analyze");
 		return response.data;
 	} catch (error) {
 		const axiosError = error as AxiosError<ErrorResponse>;
 		throw new Error(
 			axiosError.response?.data.message || "Failed to fetch analysis history",
 		)
+	}
+};
+export const fetchAllAnalyses = async (): Promise<Analysis[]> => {
+	try {
+		const response = await api.get<Analysis[]>("/api/analyze/all");
+		return response.data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ErrorResponse>;
+		throw new Error(axiosError.response?.data.message || "Failed to fetch all analyses");
 	}
 };
 
