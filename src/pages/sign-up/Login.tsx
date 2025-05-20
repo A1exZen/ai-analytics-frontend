@@ -25,8 +25,12 @@ export const Login = () => {
 			setUser(user, token);
 			toast.success("Добро пожаловать!");
 			navigate("/");
-		} catch (error: any) {
-			toast.error(error.message || "Network error. Try again.");
+		}catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Произошла ошибка при входе.");
+			} else {
+				toast.error("Произошла неизвестная ошибка.");
+			}
 			console.error("Error logging in:", error);
 		}
 	};

@@ -1,5 +1,5 @@
 import {AccordionCard} from "../components/ui/AccordionCard.tsx";
-import {metrics} from "@/data/metrics.js";
+import {metrics} from "@/data/metrics.ts";
 
 export const Info = () => {
 

@@ -64,7 +64,7 @@ export const Loader = () => {
 				animate={{y: [0, -5, 0]}}
 				transition={{repeat: Infinity, duration: 2, ease: "easeInOut"}}
 			>
-				Ваш анализ скоро будет готов
+				Ваш анализ скоро будет готов...
 			</motion.div>
 
 			<div className="w-80">

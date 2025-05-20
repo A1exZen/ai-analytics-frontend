@@ -100,9 +100,13 @@ const Search: React.FC<SearchProps> = ({ setError }) => {
 			setSearchHistory(updatedSearchHistory);
 			localStorage.setItem("searchHistory", JSON.stringify(updatedSearchHistory));
 			navigate(`/analytics/${id}`);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error("Error while searching:", error);
-			toast.error(error.message);
+			if (error instanceof Error) {
+				toast.error(error.message);
+			} else {
+				toast.error("Произошла неизвестная ошибка.");
+			}
 			stopLoading();
 		}
 	};

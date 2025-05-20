@@ -13,15 +13,6 @@ import { useNavigate } from "react-router-dom";
 import {Analysis} from "@/types/types.ts";
 import ScrollToTop from "@/utils/ScrollToTop.tsx";
 
-const containerVariants = {
-	hidden: { opacity: 0 },
-	visible: {
-		opacity: 1,
-		transition: {
-			staggerChildren: 0.2,
-		},
-	},
-};
 
 const dropdownVariants = {
 	hidden: { opacity: 0, y: -20, scale: 0.95 },
@@ -33,7 +24,7 @@ const HomeAnalytics: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [showAnalysisHistory, setShowAnalysisHistory] = useState(false);
 	const { user, token } = useUserStore();
-	const { setAnalysisHistory, setCurrentAnalysis, addToCache } = useAnalysisStore();
+	const { setCurrentAnalysis } = useAnalysisStore();
 	const navigate = useNavigate();
 	const menuRef = useRef<HTMLDivElement>(null);
 	const buttonRef = useRef<HTMLButtonElement>(null);
@@ -144,7 +135,7 @@ const HomeAnalytics: React.FC = () => {
 								</h3>
 								{useAnalysisStore.getState().analysisHistory.length > 0 ? (
 									<div className="py-2">
-										{useAnalysisStore.getState().analysisHistory.map((analysis, index) => (
+										{useAnalysisStore.getState().analysisHistory.map((analysis) => (
 											<motion.div
 												key={analysis.id}
 												className="px-4 py-2 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition duration-200"

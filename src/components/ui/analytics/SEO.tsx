@@ -2,9 +2,6 @@ import {Card} from "@/components/ui/Card.tsx";
 
 import {OpenAIAnalysis} from '@/types/types.ts'
 import React, {useState} from "react";
-import {motion} from "framer-motion";
-import {BiSolidLike} from "react-icons/bi";
-import {FaInfoCircle} from "react-icons/fa";
 
 interface ISEOProps {
 	openAIAnalysis: OpenAIAnalysis;
@@ -15,8 +12,8 @@ export const SEO: React.FC<ISEOProps> = ({openAIAnalysis}) => {
 
 	return (
 		<div
-			className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col'>
-			<div className='flex justify-between items-center mb-2'>
+			className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col w-full max-w-full'>
+			<div className='flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2'>
 				<h2
 					className='font-medium text-gray-600 dark:text-gray-200 '>
 					SEO
@@ -33,11 +30,11 @@ export const SEO: React.FC<ISEOProps> = ({openAIAnalysis}) => {
 			{
 				selectedFilter === "Все" ? (
 					<div
-						className='grid grid-cols-2 sm:grid-cols-3 gap-3  text-gray-400 h-full '>
+						className='grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-3 text-gray-400 h-full '>
 						<div
-							className='w-full h-full flex items-center justify-center border border-border rounded-xl mr-2'>
+							className='w-full flex items-center justify-center border border-border rounded-xl mr-2 py-4 sm:py-6'>
 							<div
-								className={`border-4  rounded-full p-5 text-3xl font-bold   ${openAIAnalysis.seo_score.score > 70 ? 'border-green-700 text-green-800' : 'border-red-800 text-red-800'}`}>
+								className={`border-4  rounded-full p-4 sm:p-5  text-3xl font-bold   ${openAIAnalysis.seo_score.score > 70 ? 'border-green-700 text-green-800' : 'border-red-800 text-red-800'}`}>
 								{openAIAnalysis.seo_score.score}
 							</div>
 						</div>

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useState} from "react";
 import {motion} from "framer-motion";
 import {Data} from "../types/types.ts";
 import {
@@ -13,7 +13,7 @@ import {
 import {Card} from "../components/ui/Card";
 import {FaInfoCircle} from "react-icons/fa";
 import {Info} from "./Info.tsx";
-import {MdLock, MdSpaceDashboard} from "react-icons/md";
+import {MdSpaceDashboard} from "react-icons/md";
 import {RiFolderInfoLine} from "react-icons/ri";
 import {BiSolidLike} from "react-icons/bi";
 import TrafficType from "../components/ui/analytics/TrafficType.tsx";
@@ -28,17 +28,15 @@ interface IPerfomanceItem {
 	y: number;
 }
 
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 
 const Analytics: React.FC = () => {
 
 		const [activeTab, setActiveTab] = useState<"1" | "2" | "3">("1");
 		const [isLocked] = useState(true);
-		const {currentAnalysis, setCurrentAnalysis} = useAnalysisStore();
+		const {currentAnalysis,} = useAnalysisStore();
 
-	const exportRef = useRef<HTMLDivElement>(null);
+	// const exportRef = useRef<HTMLDivElement>(null);
 
 		if (!currentAnalysis) {
 			return <div className="p-6 max-w-5xl mx-auto">Анализ не найден. Выберите
@@ -50,7 +48,7 @@ const Analytics: React.FC = () => {
 			openAIAnalysis,
 			lighthouse
 		}: Data = data
-		const {performance, metrics} = pageSpeed;
+		const {metrics} = pageSpeed;
 
 		if (!data || !data.pageSpeed) {
 			return (
@@ -363,7 +361,7 @@ const Analytics: React.FC = () => {
 											</h2>
 										</div>
 										<div
-											className='grid grid-cols-2 sm:grid-cols-3 gap-3 text-gray-400'>
+											className='grid grid-cols-1 sm:grid-cols-3 gap-3 text-gray-400'>
 											<Card
 												title="Конкуренты"
 												className="border border-border"

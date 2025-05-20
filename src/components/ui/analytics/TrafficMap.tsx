@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-// import { ReactTooltip } from "react-tooltip";
 
 declare global {
   interface Window {
     simplemaps_worldmap: {
-      mapdata: any;
+      mapdata: never;
       refresh: () => void;
     };
     simplemaps_worldmap_mapdata: {
@@ -14,7 +13,7 @@ declare global {
         state_color?: string;
         state_hover_color?: string;
         disable_click?: boolean;
-        popups?: boolean;
+        popups?: string;
         zoom?: boolean;
         manualZoom?: boolean;
         zoom_buttons?: boolean;
@@ -55,13 +54,13 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ trafficGeography }) => {
               "#FFFFFF";
   };
 
-  const legendColors = [
-    { label: ">75%", color: "#FF4D4D" },
-    { label: "50-75%", color: "#FF6B6B" },
-    { label: "25-50%", color: "#FF9999" },
-    { label: "10-25%", color: "#FFB6B6" },
-    { label: "0-10%", color: "#FFDADA" },
-  ];
+  // const legendColors = [
+  //   { label: ">75%", color: "#FF4D4D" },
+  //   { label: "50-75%", color: "#FF6B6B" },
+  //   { label: "25-50%", color: "#FF9999" },
+  //   { label: "10-25%", color: "#FFB6B6" },
+  //   { label: "0-10%", color: "#FFDADA" },
+  // ];
 
   const getRegion = (countryName: string): string => {
     const name = countryName.toLowerCase();
@@ -100,7 +99,6 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ trafficGeography }) => {
   };
 
   useEffect(() => {
-    // Загружаем скрипты
     const script1 = document.createElement("script");
     script1.src = "/maps/mapdata.js";
     const script2 = document.createElement("script");

@@ -25,9 +25,13 @@ export const Register = () => {
 			setUser(user, token);
 			toast.success("Registration successful!");
 			navigate("/");
-		} catch (error: any) {
-			toast.error(error.message || "Network error. Try again.");
-			console.error("Error registering:", error);
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Произошла ошибка при регистрации.");
+			} else {
+				toast.error("Произошла неизвестная ошибка.");
+			}
+			console.error("Error logging in:", error);
 		}
 	};
 

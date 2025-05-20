@@ -96,9 +96,9 @@ const Header: React.FC = () => {
 						Контакты
 					</NavLink>
 					<div className='flex gap-3'>
-						<NavLink to='/plans' className='main_btn'>
-							Тарифы
-						</NavLink>
+						{/*<NavLink to='/plans' className='main_btn'>*/}
+						{/*	Тарифы*/}
+						{/*</NavLink>*/}
 						{user ? (
 							<div className="relative">
 								<button

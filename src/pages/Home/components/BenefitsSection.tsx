@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { BarChart, Shield, Zap } from "lucide-react";
 import BenefitCard from "./BenefitCard";
 
-// Универсальная анимация fadeIn
 const fadeIn = {
 	hidden: { opacity: 0, y: 50 },
 	visible: {
