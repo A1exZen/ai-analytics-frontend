@@ -5,14 +5,12 @@ interface AnalysisState {
 	currentAnalysis: Analysis | null;
 	analysisHistory: Analysis[];
 	cachedAnalyses: Analysis[];
-	currentTaskId: string | null;
 	setCurrentAnalysis: (analysis: Analysis | null) => void;
 	setAnalysisHistory: (history: Analysis[]) => void;
 	setCachedAnalyses: (cache: Analysis[]) => void;
 	addToCache: (analysis: Analysis) => void;
 	clearCache: () => void;
 	clearHistory: () => void;
-	setCurrentTaskId: (taskId: string | null) => void;
 }
 
 const loadFromLocalStorage = (): Partial<AnalysisState> => {
@@ -42,7 +40,6 @@ export const useAnalysisStore = create<AnalysisState>((set) => ({
 	currentAnalysis: null,
 	analysisHistory: [],
 	cachedAnalyses: [],
-	currentTaskId: null,
 	...loadFromLocalStorage(),
 	setCurrentAnalysis: (analysis) =>
 		set((state) => {
@@ -81,5 +78,4 @@ export const useAnalysisStore = create<AnalysisState>((set) => ({
 			saveToLocalStorage(newState);
 			return newState;
 		}),
-	setCurrentTaskId: (taskId) => set({ currentTaskId: taskId }),
 }));
