@@ -1,43 +1,40 @@
-import { motion } from "framer-motion";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
-import useThemeStore from "../../zustand/useThemeStore";
-import toast from "react-hot-toast";
-import useUserStore from "../../zustand/useUserStore";
-import {
-	useAnalysisStore
-} from "@/zustand/useAnalysisStore.ts";
-import { logo } from '@/assets/index.ts';
+import { logo } from "@/assets/index.ts"
+import { useAnalysisStore } from "@/zustand/useAnalysisStore.ts"
+import { motion } from "framer-motion"
+import React, { useState } from "react"
+import toast from "react-hot-toast"
+import { Link, NavLink, useNavigate } from "react-router-dom"
+import useThemeStore from "../../zustand/useThemeStore"
+import useUserStore from "../../zustand/useUserStore"
 
 const Header: React.FC = () => {
-	const navigate = useNavigate();
-	const { theme, toggleTheme } = useThemeStore();
-	const { user, logout } = useUserStore();
-	const { clearHistory } = useAnalysisStore();
+	const navigate = useNavigate()
+	const { theme, toggleTheme } = useThemeStore()
+	const { user, logout } = useUserStore()
+	const { clearHistory } = useAnalysisStore()
 
-	const [menuOpen, setMenuOpen] = useState(false);
-	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const [menuOpen, setMenuOpen] = useState(false)
+	const [dropdownOpen, setDropdownOpen] = useState(false)
 
-	const toggleMenu = () => setMenuOpen(!menuOpen);
-	const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+	const toggleMenu = () => setMenuOpen(!menuOpen)
+	const toggleDropdown = () => setDropdownOpen(!dropdownOpen)
 
 	const handleSignOut = async () => {
 		try {
-			logout();
-			navigate("/");
-			toast.success("Вы вышли из аккаунта!");
+			logout()
+			navigate("/")
+			toast.success("Вы вышли из аккаунта!")
 		} catch (error) {
-			toast.error("Ошибка при выходе.");
-			console.error("Error signing out:", error);
+			toast.error("Ошибка при выходе.")
+			console.error("Error signing out:", error)
 		}
-	};
-
+	}
 
 	const handleClearHistory = () => {
-		clearHistory();
-		toast.success("История анализов очищена!");
-		setDropdownOpen(false);
-	};
+		clearHistory()
+		toast.success("История анализов очищена!")
+		setDropdownOpen(false)
+	}
 
 	return (
 		<motion.header
@@ -50,13 +47,13 @@ const Header: React.FC = () => {
 				className={`flex justify-between items-center w-full max-w-7xl px-2 md:px-0 py-4`}
 			>
 				<Link
-					to='/'
-					className='font-bold text-xl flex gap-1 items-center justify-center'
+					to="/"
+					className="font-bold text-xl flex gap-1 items-center justify-center"
 				>
 					<motion.img
 						src={logo}
-						alt='LOGO'
-						className='object-cover w-8 h-8'
+						alt="LOGO"
+						className="object-cover w-8 h-8"
 						initial={{ rotate: 0 }}
 						animate={{ rotate: 360 }}
 						transition={{
@@ -65,19 +62,20 @@ const Header: React.FC = () => {
 							ease: "easeInOut",
 						}}
 					/>
-					<span
-						className='uppercase text-center dark_blue_gradient font-black text-2xl'>
-            Analytics
-          </span>
+					<span className="uppercase text-center dark_blue_gradient font-black text-2xl">
+						Analytics
+					</span>
 				</Link>
 				{/* Desktop */}
-				<div className='hidden md:flex gap-8 items-center font-semibold'>
+				<div className="hidden md:flex gap-8 items-center font-semibold">
 					{user && (
 						<NavLink
-							to='/analytics'
+							to="/analytics"
 							className={({ isActive }) =>
 								`nav__link ${
-									isActive ? "text-blue-700 dark:text-blue-400 before:w-full" : ""
+									isActive
+										? "text-blue-700 dark:text-blue-400 before:w-full"
+										: ""
 								}`
 							}
 						>
@@ -86,7 +84,7 @@ const Header: React.FC = () => {
 					)}
 
 					<NavLink
-						to='/contacts'
+						to="/contacts"
 						className={({ isActive }) =>
 							`nav__link ${
 								isActive ? "text-blue-700 dark:text-blue-400 before:w-full" : ""
@@ -95,7 +93,7 @@ const Header: React.FC = () => {
 					>
 						Контакты
 					</NavLink>
-					<div className='flex gap-3'>
+					<div className="flex gap-3">
 						{/*<NavLink to='/plans' className='main_btn'>*/}
 						{/*	Тарифы*/}
 						{/*</NavLink>*/}
@@ -103,7 +101,7 @@ const Header: React.FC = () => {
 							<div className="relative">
 								<button
 									onClick={toggleDropdown}
-									className='cursor-pointer main_btn_outline flex items-center gap-2'
+									className="cursor-pointer main_btn_outline flex items-center gap-2"
 								>
 									Действия
 									<svg
@@ -146,79 +144,79 @@ const Header: React.FC = () => {
 								)}
 							</div>
 						) : (
-							<NavLink to='/sign-up/login' className='main_btn'>
+							<NavLink to="/sign-up/login" className="main_btn">
 								Войти
 							</NavLink>
 						)}
 					</div>
-					<div className='flex items-center space-x-1'>
+					<div className="flex items-center space-x-1">
 						<span>{theme === "light" ? "☀️" : "🌙"}</span>
 						<button
 							onClick={toggleTheme}
-							className='relative inline-flex items-center h-6 rounded-full w-11 bg-gray-300 dark:bg-gray-600 transition-colors'
+							className="relative inline-flex items-center h-6 rounded-full w-11 bg-gray-300 dark:bg-gray-600 transition-colors"
 						>
-              <span
-	              className={`${
-		              theme === "light" ? "translate-x-6" : "translate-x-1"
-	              } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-              />
+							<span
+								className={`${
+									theme === "light" ? "translate-x-6" : "translate-x-1"
+								} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+							/>
 						</button>
 					</div>
 				</div>
 				{/* Burger */}
-				<div className='md:hidden flex items-center'>
+				<div className="md:hidden flex items-center">
 					<button
-						className='p-2 focus:outline-hidden'
+						className="p-2 focus:outline-hidden"
 						onClick={toggleMenu}
-						aria-label='Toggle Menu'
+						aria-label="Toggle Menu"
 					>
-						<div className='w-6 h-0.5 bg-black dark:bg-white mb-1'></div>
-						<div className='w-6 h-0.5 bg-black dark:bg-white mb-1'></div>
-						<div className='w-6 h-0.5 bg-black dark:bg-white'></div>
+						<div className="w-6 h-0.5 bg-black dark:bg-white mb-1"></div>
+						<div className="w-6 h-0.5 bg-black dark:bg-white mb-1"></div>
+						<div className="w-6 h-0.5 bg-black dark:bg-white"></div>
 					</button>
 				</div>
 			</nav>
 			{menuOpen && (
 				<motion.div
-					className='w-full bg-white dark:bg-background border-b-2 border-gray-600 absolute top-14 left-0 px-7 py-6 shadow-md flex flex-col gap-4 md:hidden'
+					className="w-full bg-white dark:bg-background border-b-2 border-gray-600 absolute top-14 left-0 px-7 py-6 shadow-md flex flex-col gap-4 md:hidden"
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ type: "spring", stiffness: 50 }}
 				>
-					<div className='flex justify-between items-center gap-5'>
-						<div className='flex-1 flex flex-col gap-3'>
+					<div className="flex justify-between items-center gap-5">
+						<div className="flex-1 flex flex-col gap-3">
 							<Link
-								to='/analytics'
-								className='nav__link text-lg'
+								to="/analytics"
+								className="nav__link text-lg"
 								onClick={() => setMenuOpen(false)}
 							>
 								Анализ
 							</Link>
 							<Link
-								to='/contacts'
-								className='nav__link text-lg'
+								to="/contacts"
+								className="nav__link text-lg"
 								onClick={() => setMenuOpen(false)}
 							>
 								Контакты
 							</Link>
 						</div>
-						<div className='flex items-center space-x-1'>
+						<div className="flex items-center space-x-1">
 							<span>{theme === "light" ? "☀️" : "🌙"}</span>
 							<button
 								onClick={toggleTheme}
-								className='relative inline-flex items-center h-6 rounded-full w-11 bg-gray-300 dark:bg-gray-600 transition-colors'
+								className="relative inline-flex items-center h-6 rounded-full w-11 bg-gray-300 dark:bg-gray-600 transition-colors"
 							>
-                <span
-	                className={`${
-		                theme === "light" ? "translate-x-6" : "translate-x-1"
-	                } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-                />
+								<span
+									className={`${
+										theme === "light" ? "translate-x-6" : "translate-x-1"
+									} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+								/>
 							</button>
 						</div>
 					</div>
 					<NavLink
-						to='/plans'
-						className='main_btn w-full text-center'
+						to="/plans"
+						className="main_btn w-full text-center"
 						onClick={() => setMenuOpen(false)}
 					>
 						Тарифы
@@ -227,7 +225,7 @@ const Header: React.FC = () => {
 						<div className="relative">
 							<button
 								onClick={toggleDropdown}
-								className='main_btn w-full flex justify-center items-center gap-2'
+								className="main_btn w-full flex justify-center items-center gap-2"
 							>
 								Действия
 								<svg
@@ -271,8 +269,8 @@ const Header: React.FC = () => {
 						</div>
 					) : (
 						<NavLink
-							to='/sign-up/login'
-							className='main_btn w-full flex justify-center'
+							to="/sign-up/login"
+							className="main_btn w-full flex justify-center"
 							onClick={() => setMenuOpen(false)}
 						>
 							Авторизация
@@ -281,7 +279,7 @@ const Header: React.FC = () => {
 				</motion.div>
 			)}
 		</motion.header>
-	);
-};
+	)
+}
 
-export default Header;
+export default Header

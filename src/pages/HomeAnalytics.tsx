@@ -1,35 +1,39 @@
-import { motion } from "framer-motion";
-import React, { useState, useEffect, useRef } from "react";
-import Search from "../components/ui/Search.tsx";
-import { macPreview } from "@/assets";
-import "@/styles/loader.css";
-import { Loader } from "../components/Loader.tsx";
-import useLoadingStore from "../zustand/useLoadingStore.ts";
-import toast from "react-hot-toast";
-import { FaHistory } from "react-icons/fa";
-import { useAnalysisStore } from "../zustand/useAnalysisStore.ts";
-import useUserStore from "../zustand/useUserStore.ts";
-import { useNavigate } from "react-router-dom";
-import {Analysis} from "@/types/types.ts";
-import ScrollToTop from "@/utils/ScrollToTop.tsx";
-import {fetchAllAnalyses} from "@/api/analyzeApi.ts";
-
+import { fetchAllAnalyses } from "@/api/analyzeApi.ts"
+import { macPreview } from "@/assets"
+import "@/styles/loader.css"
+import { Analysis } from "@/types/types.ts"
+import ScrollToTop from "@/utils/ScrollToTop.tsx"
+import { motion } from "framer-motion"
+import React, { useEffect, useRef, useState } from "react"
+import toast from "react-hot-toast"
+import { FaHistory } from "react-icons/fa"
+import { useNavigate } from "react-router-dom"
+import { Loader } from "../components/Loader.tsx"
+import Search from "../components/ui/Search.tsx"
+import { useAnalysisStore } from "../zustand/useAnalysisStore.ts"
+import useLoadingStore from "../zustand/useLoadingStore.ts"
+import useUserStore from "../zustand/useUserStore.ts"
 
 const dropdownVariants = {
 	hidden: { opacity: 0, y: -20, scale: 0.95 },
-	visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
-};
+	visible: {
+		opacity: 1,
+		y: 0,
+		scale: 1,
+		transition: { duration: 0.3, ease: "easeOut" },
+	},
+}
 
 const HomeAnalytics: React.FC = () => {
-	const { isLoading } = useLoadingStore();
-	const [error, setError] = useState<string | null>(null);
-	const [showAnalysisHistory, setShowAnalysisHistory] = useState(false);
-	const { user, token } = useUserStore();
-	const { setCurrentAnalysis } = useAnalysisStore();
-	const navigate = useNavigate();
-	const menuRef = useRef<HTMLDivElement>(null);
-	const buttonRef = useRef<HTMLButtonElement>(null);
-	const [allAnalyses, setAllAnalyses] = useState<Analysis[]>([]);
+	const { isLoading } = useLoadingStore()
+	const [error, setError] = useState<string | null>(null)
+	const [showAnalysisHistory, setShowAnalysisHistory] = useState(false)
+	const { user, token } = useUserStore()
+	const { setCurrentAnalysis } = useAnalysisStore()
+	const navigate = useNavigate()
+	const menuRef = useRef<HTMLDivElement>(null)
+	const buttonRef = useRef<HTMLButtonElement>(null)
+	const [allAnalyses, setAllAnalyses] = useState<Analysis[]>([])
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -39,90 +43,59 @@ const HomeAnalytics: React.FC = () => {
 				buttonRef.current &&
 				!buttonRef.current.contains(event.target as Node)
 			) {
-				setShowAnalysisHistory(false);
+				setShowAnalysisHistory(false)
 			}
-		};
+		}
 
 		if (showAnalysisHistory) {
 			const loadAnalyses = async () => {
 				try {
-					const analyses = await fetchAllAnalyses();
-					setAllAnalyses(analyses);
+					const analyses = await fetchAllAnalyses()
+					console.log(
+						"Loaded analysis history:",
+						analyses.map(analysis => ({
+							...analysis,
+							data:
+								typeof analysis.data === "string"
+									? JSON.parse(analysis.data)
+									: analysis.data,
+						}))
+					)
+					setAllAnalyses(analyses)
 				} catch (err) {
-					toast.error((err as Error).message || "Ошибка загрузки истории");
+					toast.error((err as Error).message || "Ошибка загрузки истории")
 				}
-			};
-			loadAnalyses();
-			document.addEventListener("mousedown", handleClickOutside);
-		} else {
-			setAllAnalyses([]); // Очистка при закрытии
-		}
-
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [showAnalysisHistory]);
-
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				menuRef.current &&
-				!menuRef.current.contains(event.target as Node) &&
-				buttonRef.current &&
-				!buttonRef.current.contains(event.target as Node)
-			) {
-				setShowAnalysisHistory(false);
 			}
-		};
-
-		if (showAnalysisHistory) {
-			document.addEventListener("mousedown", handleClickOutside);
+			loadAnalyses()
+			document.addEventListener("mousedown", handleClickOutside)
+		} else {
+			setAllAnalyses([]) // Очистка при закрытии
 		}
 
 		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [showAnalysisHistory]);
-
+			document.removeEventListener("mousedown", handleClickOutside)
+		}
+	}, [showAnalysisHistory])
 
 	const toggleAnalysisHistory = () => {
 		if (!user || !token) {
-			toast.error("Пожалуйста, авторизуйтесь, чтобы просмотреть историю анализа.");
-			return;
+			toast.error(
+				"Пожалуйста, авторизуйтесь, чтобы просмотреть историю анализа."
+			)
+			return
 		}
-		setShowAnalysisHistory(!showAnalysisHistory);
-
-	};
-
-	const checkCachedAnalysis = (url: string): Analysis | null => {
-		return useAnalysisStore.getState().cachedAnalyses.find((analysis) => analysis.url === url) || null;
-	};
+		setShowAnalysisHistory(!showAnalysisHistory)
+	}
 
 	const handleSelectAnalysis = (analysis: Analysis) => {
-		const cachedAnalysis = checkCachedAnalysis(analysis.url);
-		if (cachedAnalysis) {
-			setCurrentAnalysis(cachedAnalysis);
-			navigate(`/analytics/${analysis.id}`);
-			toast.success("Анализ загружен!");
-			return;
-		}
-
-		const storedCurrent = useAnalysisStore.getState().currentAnalysis;
-		if (storedCurrent && storedCurrent.id === analysis.id) {
-			setCurrentAnalysis(storedCurrent);
-			navigate(`/analytics/${analysis.id}`);
-			toast.success("Анализ загружен из localStorage!");
-			return;
-		}
-
-		setCurrentAnalysis(analysis);
-		navigate(`/analytics/${analysis.id}`);
-		toast.success("Анализ загружен из истории!");
-	};
+		setCurrentAnalysis(analysis)
+		navigate(`/analytics/${analysis.id}`)
+		toast.success("Анализ загружен!")
+	}
 
 	return (
 		<>
-			<ScrollToTop/>
+			<ScrollToTop />
 			{isLoading && <Loader />}
 			{error && toast.error(`${error}`)}
 			<div className="main" />
@@ -138,8 +111,9 @@ const HomeAnalytics: React.FC = () => {
 						<span className="blue_gradient "> Сайтов</span>
 					</h1>
 					<h2 className="desc">
-						Повышайте трафик и позиции в выдаче с помощью комплексного SEO-анализа. Получайте отчеты о состоянии сайта
-						и рекомендации по его улучшению.
+						Повышайте трафик и позиции в выдаче с помощью комплексного
+						SEO-анализа. Получайте отчеты о состоянии сайта и рекомендации по
+						его улучшению.
 					</h2>
 				</div>
 
@@ -168,22 +142,27 @@ const HomeAnalytics: React.FC = () => {
 								</h3>
 								{allAnalyses.length > 0 ? (
 									<div className="py-2">
-										{allAnalyses.map((analysis) => (
+										{allAnalyses.map(analysis => (
 											<motion.div
 												key={analysis.id}
 												className="px-4 py-2 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition duration-200"
 												onClick={() => handleSelectAnalysis(analysis)}
 												whileHover={{ scale: 1.02 }}
 											>
-												<p className="text-gray-700 dark:text-gray-300 font-semibold truncate">{analysis.url}</p>
+												<p className="text-gray-700 dark:text-gray-300 font-semibold truncate">
+													{analysis.url}
+												</p>
 												<p className="text-sm text-gray-500 dark:text-gray-400">
-													{new Date(analysis.createdAt).toLocaleDateString("ru-RU", {
-														day: "2-digit",
-														month: "2-digit",
-														year: "numeric",
-														hour: "2-digit",
-														minute: "2-digit",
-													})}
+													{new Date(analysis.createdAt).toLocaleDateString(
+														"ru-RU",
+														{
+															day: "2-digit",
+															month: "2-digit",
+															year: "numeric",
+															hour: "2-digit",
+															minute: "2-digit",
+														}
+													)}
 												</p>
 											</motion.div>
 										))}
@@ -213,7 +192,7 @@ const HomeAnalytics: React.FC = () => {
 				</div>
 			</motion.main>
 		</>
-	);
-};
+	)
+}
 
-export default HomeAnalytics;
+export default HomeAnalytics
