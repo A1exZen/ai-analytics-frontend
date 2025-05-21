@@ -31,7 +31,7 @@ const Home: React.FC = () => {
 	return (
 		<>
 			<motion.main
-				className="pb-10 w-full flex flex-col items-center gap-10 z-10 px-4 sm:px-6 lg:px-8"
+				className="mt-15 md:mt-0 pb-10 w-full flex flex-col items-center gap-10 z-10 px-4 sm:px-6 lg:px-8"
 				initial="hidden"
 				animate="visible"
 				variants={containerVariants}

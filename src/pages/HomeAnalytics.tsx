@@ -138,7 +138,7 @@ const HomeAnalytics: React.FC = () => {
 								animate="visible"
 							>
 								<h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 px-4 py-3 border-b border-gray-200/30 dark:border-gray-700/30">
-									История анализа (все пользователи)
+									История анализа
 								</h3>
 								{allAnalyses.length > 0 ? (
 									<div className="py-2">
