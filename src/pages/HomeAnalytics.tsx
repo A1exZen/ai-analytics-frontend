@@ -1,81 +1,86 @@
-import { fetchAllAnalyses } from "@/api/analyzeApi.ts"
-import { macPreview } from "@/assets"
+import {fetchAllAnalyses} from "@/api/analyzeApi.ts"
+import {macPreview} from "@/assets"
 import "@/styles/loader.css"
-import { Analysis } from "@/types/types.ts"
+import {Analysis} from "@/types/types.ts"
 import ScrollToTop from "@/utils/ScrollToTop.tsx"
-import { motion } from "framer-motion"
-import React, { useEffect, useRef, useState } from "react"
+import {motion} from "framer-motion"
+import React, {useEffect, useRef, useState} from "react"
 import toast from "react-hot-toast"
-import { FaHistory } from "react-icons/fa"
-import { useNavigate } from "react-router-dom"
-import { Loader } from "../components/Loader.tsx"
+import {FaHistory} from "react-icons/fa"
+import {useNavigate} from "react-router-dom"
+import {Loader} from "../components/Loader.tsx"
 import Search from "../components/ui/Search.tsx"
-import { useAnalysisStore } from "../zustand/useAnalysisStore.ts"
+import {useAnalysisStore} from "../zustand/useAnalysisStore.ts"
 import useLoadingStore from "../zustand/useLoadingStore.ts"
 import useUserStore from "../zustand/useUserStore.ts"
 
 const dropdownVariants = {
-	hidden: { opacity: 0, y: -20, scale: 0.95 },
+	hidden: {opacity: 0, y: -20, scale: 0.95},
 	visible: {
 		opacity: 1,
 		y: 0,
 		scale: 1,
-		transition: { duration: 0.3, ease: "easeOut" },
+		transition: {duration: 0.3, ease: "easeOut"},
 	},
 }
 
 const HomeAnalytics: React.FC = () => {
-	const { isLoading } = useLoadingStore()
+	const {isLoading} = useLoadingStore()
 	const [error, setError] = useState<string | null>(null)
 	const [showAnalysisHistory, setShowAnalysisHistory] = useState(false)
-	const { user, token } = useUserStore()
-	const { setCurrentAnalysis } = useAnalysisStore()
+	const [isLoadingHistory, setIsLoadingHistory] = useState(false)
+	const {user, token} = useUserStore()
+	const {setCurrentAnalysis} = useAnalysisStore()
 	const navigate = useNavigate()
 	const menuRef = useRef<HTMLDivElement>(null)
 	const buttonRef = useRef<HTMLButtonElement>(null)
 	const [allAnalyses, setAllAnalyses] = useState<Analysis[]>([])
 
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				menuRef.current &&
-				!menuRef.current.contains(event.target as Node) &&
-				buttonRef.current &&
-				!buttonRef.current.contains(event.target as Node)
-			) {
-				setShowAnalysisHistory(false)
-			}
-		}
-
-		if (showAnalysisHistory) {
-			const loadAnalyses = async () => {
-				try {
-					const analyses = await fetchAllAnalyses()
-					console.log(
-						"Loaded analysis history:",
-						analyses.map(analysis => ({
-							...analysis,
-							data:
-								typeof analysis.data === "string"
-									? JSON.parse(analysis.data)
-									: analysis.data,
-						}))
-					)
-					setAllAnalyses(analyses)
-				} catch (err) {
-					toast.error((err as Error).message || "Ошибка загрузки истории")
+			const handleClickOutside = (event: MouseEvent) => {
+				if (
+					menuRef.current &&
+					!menuRef.current.contains(event.target as Node) &&
+					buttonRef.current &&
+					!buttonRef.current.contains(event.target as Node)
+				) {
+					setShowAnalysisHistory(false)
 				}
 			}
-			loadAnalyses()
-			document.addEventListener("mousedown", handleClickOutside)
-		} else {
-			setAllAnalyses([]) // Очистка при закрытии
-		}
 
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside)
-		}
-	}, [showAnalysisHistory])
+			if (showAnalysisHistory) {
+				const loadAnalyses = async () => {
+					try {
+						setIsLoadingHistory(true)
+						const analyses = await fetchAllAnalyses()
+						console.log(
+							"Loaded analysis history:",
+							analyses.map(analysis => ({
+								...analysis,
+								data:
+									typeof analysis.data === "string"
+										? JSON.parse(analysis.data)
+										: analysis.data,
+							}))
+						)
+						setAllAnalyses(analyses)
+					} catch (err) {
+						toast.error((err as Error).message || "Ошибка загрузки истории")
+					} finally {
+						setIsLoadingHistory(false)
+					}
+				}
+				loadAnalyses()
+				document.addEventListener("mousedown", handleClickOutside)
+			} else {
+				setAllAnalyses([])
+			}
+
+			return () => {
+				document.removeEventListener("mousedown", handleClickOutside)
+			}
+		}, [showAnalysisHistory]
+	)
 
 	const toggleAnalysisHistory = () => {
 		if (!user || !token) {
@@ -95,15 +100,15 @@ const HomeAnalytics: React.FC = () => {
 
 	return (
 		<>
-			<ScrollToTop />
-			{isLoading && <Loader />}
+			<ScrollToTop/>
+			{isLoading && <Loader/>}
 			{error && toast.error(`${error}`)}
-			<div className="main" />
+			<div className="main"/>
 			<motion.main
 				className="mt-20 pb-10 sm:pt-32 w-full flex flex-col items-center gap-16 z-10 px-2 relative"
-				initial={{ y: 50, opacity: 0 }}
-				animate={{ y: 0, opacity: 1 }}
-				transition={{ type: "spring", stiffness: 50 }}
+				initial={{y: 50, opacity: 0}}
+				animate={{y: 0, opacity: 1}}
+				transition={{type: "spring", stiffness: 50}}
 			>
 				<div>
 					<h1 className="head_text">
@@ -123,10 +128,10 @@ const HomeAnalytics: React.FC = () => {
 							ref={buttonRef}
 							onClick={toggleAnalysisHistory}
 							className="w-12 h-12 flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md"
-							whileHover={{ scale: 1.1, rotate: 10 }}
-							whileTap={{ scale: 0.9 }}
+							whileHover={{scale: 1.1, rotate: 10}}
+							whileTap={{scale: 0.9}}
 						>
-							<FaHistory size={20} />
+							<FaHistory size={20}/>
 						</motion.button>
 
 						{showAnalysisHistory && (
@@ -137,19 +142,27 @@ const HomeAnalytics: React.FC = () => {
 								initial="hidden"
 								animate="visible"
 							>
-								<h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 px-4 py-3 border-b border-gray-200/30 dark:border-gray-700/30">
+								<h3
+									className="text-lg font-semibold text-gray-800 dark:text-gray-200 px-4 py-3 border-b border-gray-200/30 dark:border-gray-700/30">
 									История анализа
 								</h3>
-								{allAnalyses.length > 0 ? (
+								{isLoadingHistory ? (
+									<div className="flex items-center justify-center p-4">
+										<div className="flex justify-center items-center p-4">
+											<div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+										</div>
+									</div>
+								) : allAnalyses.length > 0 ? (
 									<div className="py-2">
 										{allAnalyses.map(analysis => (
 											<motion.div
 												key={analysis.id}
 												className="px-4 py-2 cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition duration-200"
 												onClick={() => handleSelectAnalysis(analysis)}
-												whileHover={{ scale: 1.02 }}
+												whileHover={{scale: 1.02}}
 											>
-												<p className="text-gray-700 dark:text-gray-300 font-semibold truncate">
+												<p
+													className="text-gray-700 dark:text-gray-300 font-semibold truncate">
 													{analysis.url}
 												</p>
 												<p className="text-sm text-gray-500 dark:text-gray-400">
@@ -178,13 +191,13 @@ const HomeAnalytics: React.FC = () => {
 				)}
 
 				{/* Search */}
-				<Search setError={setError} />
+				<Search setError={setError}/>
 
 				<div className="flex items-center justify-center">
 					<motion.img
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						transition={{ duration: 0.5, ease: "easeInOut", bounce: 0.2 }}
+						initial={{opacity: 0, scale: 0.8}}
+						animate={{opacity: 1, scale: 1}}
+						transition={{duration: 0.5, ease: "easeInOut", bounce: 0.2}}
 						src={macPreview}
 						alt="preview"
 						className="max-w-[80%] my-16 md:max-w-[60%] drop-shadow-xl"
